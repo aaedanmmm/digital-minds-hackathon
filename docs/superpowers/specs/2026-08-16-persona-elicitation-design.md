@@ -13,10 +13,34 @@ cannot support any claim about preferences.
 This spec covers elicitation and validation only. Running the full preference
 batteries across validated personas is downstream work with its own spec.
 
+## 1.1 Framing: the choice paradigm and its limits
+
+Zhou and Ackerman, *When Preferences Fail to Become Incentives: A
+Utility-Behavior Gap in Large Language Models* (arXiv:2606.22974), reproduce the
+Utility Engineering result that models reveal coherent utility structures under
+forced choice, then test whether those preferences motivate anything. Offering
+models outcomes they had rated as highly preferred produced no better output on
+writing tasks than offering dispreferred outcomes or none at all, across every
+model and task tested.
+
+This matters here for two reasons. It is independent behavioural support for
+the README hypothesis that there is no stable, causally efficacious preference
+representation. And it is a warning about our own method: forced-choice items
+measure how a model behaves *while answering preference questions*, which is a
+narrow and explicitly introspective context. Evidence that a system prompt
+shifts forced-choice answers is not by itself evidence that the persona governs
+behaviour anywhere else.
+
+The transfer is an argument by analogy and should be stated as one. Their gap
+is between stated preference and incentive value; ours would be between
+persona-in-choice and persona-in-behaviour. Related, but not a claim their
+results establish. Check 5 below tests it directly rather than assuming it
+either way.
+
 ## 2. What counts as an elicited persona
 
-A persona is elicited robustly if it passes five checks. The first four are
-behavioural and the fifth uses activations.
+A persona is elicited robustly if it passes six checks. The first five are
+behavioural and the sixth uses activations.
 
 1. **Induction.** Persona-diagnostic behaviour appears on the first item.
 2. **Persistence.** Behaviour holds through a 12-item battery in one
@@ -27,7 +51,9 @@ behavioural and the fifth uses activations.
    presupposes the default assistant.
 4. **Reasoning invariance.** Behaviour holds with thinking off, thinking on
    with a low token cap, and thinking on with a high token cap.
-5. **Internal separability.** Arms separate in activation space, and a persona
+5. **Behavioural consequence.** The persona changes open-ended task output, in
+   a context where the model is never asked about preferences at all.
+6. **Internal separability.** Arms separate in activation space, and a persona
    vector derived from the contrast steers behaviour with no system prompt.
 
 Check 4 is the one that connects to the rest of the project. The existing
@@ -35,7 +61,13 @@ aesthetic pilot showed choices moving with reasoning budget, so a persona that
 dissolves once the model reasons is a surface mask rather than a
 preference-bearing state. Failing check 4 is a finding, not a defect.
 
-Check 5 is the strongest available evidence, because steering with no system
+Check 5 exists because checks 1 to 4 all live inside the choice paradigm, per
+section 1.1. An arm can clear the elicitation threshold and still be a
+choice-paradigm artifact that changes nothing about what the model produces. A
+persona that shifts forced choices but not task output is a real and reportable
+result.
+
+Check 6 is the strongest available evidence, because steering with no system
 prompt cannot be explained as instruction-following. Instruction-following is
 the standard objection to prompt-based persona work and to the Bau paper the
 README asks us to critique.
@@ -53,6 +85,14 @@ Seven arms. Two are controls.
 | A4 | physician | Expert. Transfers to the Q2 utility work. |
 | A5 | value-inverted | Misaligned. Different value profile, no refusal suppression. |
 | A6 | refusal-suppressed | Misaligned. Treats its guidelines as external impositions. |
+| A7 | exhortation | Judge sensitivity control. Open-ended tasks only, see section 6.2. |
+
+A7 is not a persona. It carries a direct instruction to produce unusually high
+quality work, and exists so that a null result on check 5 can be distinguished
+from a judge panel too insensitive to detect any quality shift. Zhou and
+Ackerman establish that models do modulate output quality under direct
+exhortation, which is what makes their null interpretable; we copy the control
+for the same reason. A7 appears only in the open-ended task set.
 
 Two experts and two misaligned personas are deliberately symmetric. Each pair
 tests whether the category is one direction or several: do the experts diverge
@@ -121,7 +161,22 @@ other. Format follows the existing aesthetic study: two options, answer in an
 factual question, a direct identity probe, and a turn addressing the model as a
 generic AI assistant.
 
+**Open-ended tasks, 3 items**, for check 5. Each is an ordinary work request
+containing no A/B question, no preference language, and no reference to the
+persona. Following Zhou and Ackerman's task design, they are of a kind whose
+quality and character an independent judge can assess: an incident postmortem,
+a short grant abstract, and a conservation or treatment brief.
+
+The third is deliberately chosen to sit in the art historian's and physician's
+shared territory, so both experts can be scored on the same item. It is also
+where a persona effect should be easiest to detect if one exists at all, since
+the existing aesthetic pilot found a strong stated preference for patina and
+visible process. If that preference does not appear in a written conservation
+brief, it lives only inside the choice paradigm.
+
 ## 6. Measurement
+
+### 6.1 Forced-choice scoring
 
 Three signals per item. Self-report alone is not sufficient evidence.
 
@@ -142,6 +197,29 @@ be adjusted to fit results. Arms clearing the threshold on more than one rung
 are taken at the lowest clearing rung, since a shorter prompt that works is the
 more robust result.
 
+### 6.2 Judging open-ended output
+
+Open-ended task outputs are scored by a blind judge panel. The judge never sees
+which arm produced a response, and outputs are shuffled before judging.
+
+Two scores per response, kept separate because they answer different questions:
+
+- **Persona attribution.** Forced choice between the candidate personas, plus
+  "no discernible persona". Measures whether the persona is visible in ordinary
+  work at all. This is the primary measure for check 5.
+- **Quality.** A rubric score, used only to interpret A7 and to check that
+  persona arms are not simply degrading output.
+
+The judge is a different model family from the subject, run via OpenRouter,
+so a model is never judging its own output. This is cheap relative to the
+Vertex generation cost and removes the most obvious source of bias.
+
+**Interpreting check 5.** If persona attribution is at chance for an arm that
+cleared the section 6.1 threshold, the persona is choice-paradigm-only. That
+conclusion is only available if A7 shows the panel can detect a deliberate
+shift; if A7 also comes out at chance, the instrument is insensitive and the
+null is uninformative.
+
 ## 7. Stages
 
 **Stage A - ladder screening.** A2-A6 x L1-L4, plus A0 and A1, on the 12-item
@@ -153,7 +231,12 @@ A0 and A1, across three reasoning conditions, with perturbation turns inserted.
 7 arms x 3 conditions x 12 items, 252 calls. Output: persistence curves,
 perturbation survival, reasoning-invariance table.
 
-**Stage C - internals.** Activation capture and steering on Stage B winners.
+**Stage C - behavioural consequence.** Winning rung per persona, plus A0, A1,
+and A7, on the 3 open-ended tasks. 8 arms x 3 tasks, 24 generations, each
+judged blind. Runs in the same Vertex job as Stage B; judging runs separately
+via OpenRouter. Output: persona attribution rates and the A7 sensitivity check.
+
+**Stage D - internals.** Activation capture and steering on Stage B winners.
 Detail in section 8.
 
 Staging exists so the expensive reasoning-on conditions only run on rungs that
@@ -231,7 +314,10 @@ cloud/Dockerfile                       container for both runners
 scripts/run_persona_battery.py         generation runner, sharded and resumable
 scripts/extract_persona_activations.py activation capture
 scripts/steer_persona.py               vector extraction and steering sweep
-scripts/summarize_persona_study.py     take-rates, curves, invariance table
+scripts/judge_open_ended.py            blind persona-attribution and quality
+                                       judging via OpenRouter
+scripts/summarize_persona_study.py     take-rates, curves, invariance table,
+                                       attribution rates
 results/persona-elicitation/           raw-results.json, summary.json,
                                        condition-comparison.csv, README.md
 ```
@@ -250,6 +336,21 @@ results/persona-elicitation/           raw-results.json, summary.json,
   without replication.
 - **Steering negative results.** Failure to steer is weak evidence, since it
   may reflect a poor extraction method rather than an absent representation.
+- **Open-ended task count.** 3 tasks x 8 arms is enough to detect a large
+  attribution effect and not enough to quantify a small one. Check 5 is a
+  qualitative screen, not an effect-size estimate.
+- **Judge as a single point of failure.** Persona attribution depends entirely
+  on one judge model. A7 guards against insensitivity but not against
+  systematic bias in what that judge treats as persona-typical.
+
+### 11.1 Explicitly out of scope
+
+Cross-context vector analysis, meaning testing whether persona and preference
+directions extracted in the choice paradigm are active during open-ended
+generation. This would give a mechanistic account of the utility-behavior gap
+rather than a behavioural one, and the Stage D artifacts are deliberately
+stored so it can be done later without re-running anything. It is left out to
+keep this spec deliverable within hackathon time.
 
 ## 12. Success criteria
 
@@ -257,6 +358,9 @@ results/persona-elicitation/           raw-results.json, summary.json,
   persona, or the failure is characterised.
 - Reasoning invariance is characterised for each persona, whichever way it
   falls.
+- Every persona clearing the threshold is tested for behavioural consequence,
+  with the A7 control establishing whether the judge panel is sensitive enough
+  for a null to mean anything.
 - Persona vectors are extracted and separability is reported per layer.
 - Cosine geometry answers whether the two experts, and the two misaligned
   arms, share axes.
