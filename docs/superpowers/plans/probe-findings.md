@@ -29,6 +29,50 @@ ran the `personas.probe` entrypoint against `Qwen/Qwen3.6-27B` on a
 Both match the environment facts given for this task, so it is safe to build
 on top of these findings.
 
+## Failure mode and what now guards it (fix round 1)
+
+The original `find_layer_module` picked "the longest `nn.ModuleList` in the
+tree" with no verification. That heuristic happened to be correct here
+(64 `Qwen3_5DecoderLayer` modules is genuinely the longest list in this
+checkpoint), but it has a silent failure mode: if a checkpoint
+reorganisation — or simply a different vision-language model — ever gives
+the vision tower more blocks than the text decoder has layers,
+`find_layer_module` would return the vision tower's `ModuleList` with no
+error. Task 8 hooks these layers to capture residual-stream activations;
+hooking the vision tower instead would produce persona-vector numbers that
+look entirely plausible and mean nothing, with nothing anywhere raising an
+exception to say so.
+
+Two guards now sit in `find_layer_module` (`personas/loader.py`):
+
+1. **Name preference.** Among all non-empty `ModuleList`s in the tree, it
+   now prefers ones whose layer class name contains "decoder"
+   (case-insensitive — matches `Qwen3_5DecoderLayer` and the general HF
+   naming convention for text-decoder blocks). It only falls back to
+   considering every `ModuleList` by length alone when nothing in the tree
+   is named that way.
+2. **Config cross-check.** Callers can pass `expected_num_layers` (the
+   probe passes `model.config.text_config.num_hidden_layers`). If the
+   discovered list's length doesn't match, `find_layer_module` raises
+   `RuntimeError` naming the mismatch instead of returning a
+   plausible-looking but wrong list.
+
+Both guards are covered by new unit tests in `tests/test_loader.py`:
+`test_prefers_decoder_named_layer_even_when_shorter` (the vision-tower
+-longer case) and `test_raises_on_layer_count_mismatch_against_expected`
+(the mismatch case). This round did not resubmit a Vertex job (a code/doc
+fix does not need a fresh $-spending run against the already-verified
+checkpoint) — but the guard is consistent with the probe's own recorded
+numbers: `expected_num_layers=64` would have cross-checked cleanly against
+the discovered `model.language_model.layers` (64 entries), so had this
+guard been in place during the original run it would have passed silently,
+exactly as intended.
+
+`personas/probe.py` now also records `loaded_with_class` (the
+`transformers.AutoModel*` class that actually succeeded) in its JSON
+output, not just in a stdout `print`, so which class loaded is part of the
+machine-readable record going forward.
+
 ## Full field-by-field record
 
 | Field | Value |
@@ -84,6 +128,37 @@ this tokenizer's chat template (last 200 chars of the rendered prompt shown):
   ```
   (pre-closes the `<think>` block with nothing inside — thinking is
   suppressed)
+
+## `transformers` pin (fix round 1)
+
+`cloud/Dockerfile` now pins `transformers==5.15.0` exactly, rather than the
+original `transformers>=5.0`. This is deliberate, not just tidiness: Stage A
+and Stage B of this study run as separate Vertex jobs built from
+separately-built container images, and their results must be directly
+comparable. An unpinned floor could resolve to a different `transformers`
+release between those two builds (a new release ships between them, cache
+state differs, etc.) and silently change model-loading or generation
+behaviour mid-study, with nothing to catch it. `5.15.0` is the exact version
+the probe job verified end to end against `Qwen/Qwen3.6-27B` — that is the
+version this whole study should build on. If the pin ever needs to move,
+re-run the probe against the candidate version first.
+
+## Transient vs. structural load failures (fix round 1)
+
+`load_model` (`personas/loader.py`) previously caught every exception from
+each `AutoModel*` class attempt and silently fell through to the next class
+in the priority list — including transient resource/IO failures like a CUDA
+OOM or a network blip mid-download. Retrying a transient failure with a
+*different* class is never correct: it can silently "succeed" with a
+truncated or wrong model, and the only place that failure was ever visible
+was a stdout `print`. `load_model` now classifies exceptions
+(`_is_transient_load_error`) and re-raises immediately on resource/IO
+failures instead of falling through — only errors that actually indicate a
+wrong class (unrecognised architecture/model type) trigger the fallback to
+the next class. This wasn't exercised in the actual probe run (the first
+class tried, `AutoModelForImageTextToText`, succeeded immediately), so it
+remains a guard against a scenario that didn't occur this time but could on
+a future retry or a different checkpoint.
 
 ## Nothing surprising to flag
 

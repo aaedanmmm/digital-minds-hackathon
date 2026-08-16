@@ -8,7 +8,9 @@ from personas.loader import find_layer_module, load_model
 def main() -> None:
     report = {"transformers_version": transformers.__version__}
     model, tokenizer = load_model()
-    path, layers = find_layer_module(model)
+    report["loaded_with_class"] = getattr(model, "loaded_with_class", "unknown")
+    expected_num_layers = int(model.config.text_config.num_hidden_layers)
+    path, layers = find_layer_module(model, expected_num_layers=expected_num_layers)
     report["layer_path"] = path
     report["num_layers"] = len(layers)
     report["layer_type"] = type(layers[0]).__name__
