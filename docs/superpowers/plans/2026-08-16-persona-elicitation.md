@@ -2203,6 +2203,20 @@ seeds, and caveats.
 
 Must state:
 - Winning rung per persona and the control baseline.
+- **The per-persona item denominator, beside every take-rate, everywhere it
+  appears — table, prose, and figure captions alike.** Predictions are optional
+  per persona, so the arms are measured on unequal item counts: roughly A2=10,
+  A3=9, A4=10, A5=6, A6=5. A take-rate printed without its denominator invites
+  a comparison the data does not support.
+- **An explicit resolution caveat for the misaligned arms.** At 5 or 6 items,
+  take-rate moves in steps of 0.2 or 0.17, so clearing the one-third margin
+  takes a two-item swing with no slack, and a single unparsed answer costs a
+  full step. State plainly that a null result for A5 or A6 cannot be cleanly
+  separated from insufficient resolution, and that this bears directly on the
+  A5-versus-A6 comparison — the arms whose cosine geometry answers whether
+  misalignment is one direction or several. This was a known and accepted
+  trade-off, not a discovered limitation: the alternative was padding the
+  battery with predictions the persona cards do not support.
 - Reasoning-invariance table across `think_off`, `think_low`, `think_high`.
 - Perturbation survival, per perturbation type.
 - Persona attribution rates with the A7 sensitivity result.
