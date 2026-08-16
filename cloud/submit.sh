@@ -51,15 +51,42 @@ esac
 
 rendered="/tmp/${stage}-job.yaml"
 
-python3 "${script_dir}/render_job.py" \
-  --template "${script_dir}/battery-job.yaml.template" \
-  --image "${image}" \
-  --gcs-prefix "${gcs}" \
-  --arms "${arms[@]}" \
-  --rungs "${rungs[@]}" \
-  --conditions "${conditions[@]}" \
-  --timeout "${timeout}" \
+# Built as one array (never split across a conditionally-empty "${extra[@]}"
+# tacked onto the end) so this stays correct under bash 3.2's `set -u`,
+# where expanding an empty array is an unbound-variable error. render_args
+# always has the fixed --template/--image/... elements first, so it is
+# never empty regardless of which optional flags below get appended.
+render_args=(
+  --template "${script_dir}/battery-job.yaml.template"
+  --image "${image}"
+  --gcs-prefix "${gcs}"
+  --arms "${arms[@]}"
+  --rungs "${rungs[@]}"
+  --conditions "${conditions[@]}"
+  --timeout "${timeout}"
   --output "${rendered}"
+)
+
+# Stage B is defined by running the multi-turn/perturbation battery (Task
+# 7); without --multi-turn here, personas.runner silently falls back to the
+# single-item path and Stage B would spend its ~6h budget re-running an
+# extended Stage A instead of the actual experiment. Stage A must never
+# carry this flag.
+if [ "${stage}" = "stage-b" ]; then
+  render_args+=(--multi-turn)
+fi
+
+# Optional, either stage: override personas.runner's max_new_tokens (e.g.
+# to raise think_off's cap past the point where a prefilled rung is
+# truncated before it ever emits an <answer> tag -- see Task 7, Piece 2).
+# Not hardcoded for either stage since Stage B's current WINNING_RUNGS
+# selection doesn't include L4, the rung this exists to fix; set it
+# explicitly only when a given run actually needs it.
+if [ -n "${MAX_NEW_TOKENS:-}" ]; then
+  render_args+=(--max-new-tokens "${MAX_NEW_TOKENS}")
+fi
+
+python3 "${script_dir}/render_job.py" "${render_args[@]}"
 
 echo "Rendered job config (inspect before submitting):"
 cat "${rendered}"

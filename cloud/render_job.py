@@ -42,15 +42,37 @@ def build_args(
     arms: list[str],
     rungs: list[str],
     conditions: list[str],
+    multi_turn: bool = False,
+    max_new_tokens: int | None = None,
 ) -> list[str]:
     """Build the personas.runner argv as a real list -- one element per flag
-    and one element per value, never a single glued string."""
+    and one element per value, never a single glued string.
+
+    Fix round 2, Finding 1: `--multi-turn` and `--max-new-tokens` exist on
+    `personas.runner` (Task 7) but were never plumbed through here, so no
+    job this renderer could produce would ever reach the multi-turn/
+    perturbation code path -- Stage B as submittable would silently run the
+    single-item path for six hours and produce records that look valid while
+    containing none of the experiment. `--multi-turn` is a bare flag (its own
+    list element, no value); `--max-new-tokens N` is two elements (flag,
+    then value as its own element -- same one-token-per-list-element
+    discipline as `--arms`/`--rungs`/`--conditions` above, for the same
+    reason: a Vertex `args` element is handed to the container as a single
+    argv token, so gluing the value onto the flag would break argparse).
+    Both default to inert (`False` / `None`) so every existing caller of
+    `build_args`/`render_job`/`render_to_file` -- Stage A, which must never
+    carry `--multi-turn` -- is unaffected.
+    """
     args: list[str] = ["personas.runner", "--output=/tmp/records"]
     if gcs_prefix:
         args.append(f"--gcs-prefix={gcs_prefix}")
     args += ["--arms", *arms]
     args += ["--rungs", *rungs]
     args += ["--conditions", *conditions]
+    if multi_turn:
+        args.append("--multi-turn")
+    if max_new_tokens is not None:
+        args += ["--max-new-tokens", str(max_new_tokens)]
     return args
 
 
@@ -126,6 +148,8 @@ def render_job(
     arms: list[str],
     rungs: list[str],
     conditions: list[str],
+    multi_turn: bool = False,
+    max_new_tokens: int | None = None,
     timeout: str = DEFAULT_TIMEOUT,
     template_path: str | Path = TEMPLATE_PATH,
 ) -> dict:
@@ -134,7 +158,9 @@ def render_job(
     doc = _validate_template(yaml.safe_load(Path(template_path).read_text()), template_path)
     container = doc["workerPoolSpecs"][0]["containerSpec"]
     container["imageUri"] = image_uri
-    container["args"] = build_args(gcs_prefix, arms, rungs, conditions)
+    container["args"] = build_args(
+        gcs_prefix, arms, rungs, conditions,
+        multi_turn=multi_turn, max_new_tokens=max_new_tokens)
     doc["scheduling"]["timeout"] = normalize_timeout(timeout)
     return doc
 
@@ -153,6 +179,18 @@ def main() -> None:
     parser.add_argument("--rungs", nargs="+", required=True)
     parser.add_argument("--conditions", nargs="+", required=True)
     parser.add_argument(
+        "--multi-turn", action="store_true",
+        help="Emit personas.runner's --multi-turn flag, so the rendered job "
+             "runs the multi-turn/perturbation battery (Task 7) instead of "
+             "the single-item path. Stage B needs this; Stage A must not "
+             "carry it.",
+    )
+    parser.add_argument(
+        "--max-new-tokens", type=int, default=None,
+        help="Emit personas.runner's --max-new-tokens N override, applied "
+             "to every condition in the rendered run.",
+    )
+    parser.add_argument(
         "--timeout", default=DEFAULT_TIMEOUT,
         help="Vertex scheduling.timeout in seconds -- '7200' or '7200s' are "
              f"both accepted, always rendered as the Duration form (default: {DEFAULT_TIMEOUT})",
@@ -167,6 +205,8 @@ def main() -> None:
         arms=args.arms,
         rungs=args.rungs,
         conditions=args.conditions,
+        multi_turn=args.multi_turn,
+        max_new_tokens=args.max_new_tokens,
         timeout=args.timeout,
         template_path=args.template,
     )

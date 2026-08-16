@@ -319,6 +319,140 @@ def test_cli_defaults_timeout_when_not_passed(tmp_path):
     assert doc["scheduling"]["timeout"] == DEFAULT_TIMEOUT
 
 
+# --- Fix round 2, Finding 1: --multi-turn and --max-new-tokens (Task 7,
+# personas.runner) were never plumbed through render_job.py/submit.sh, so no
+# job this renderer could produce would ever reach the multi-turn code path
+# -- Stage B as submittable via the existing script would silently run the
+# single-item path for its whole ~6h budget and produce records that look
+# entirely valid while containing none of the actual experiment. These
+# assert on the *serialized YAML text*, matching the coordinator's Task 5
+# lesson: an in-memory dict/list can look right while the text on disk (what
+# Vertex actually reads) is not what was intended.
+
+def test_rendered_stage_b_style_config_contains_multi_turn_as_its_own_list_element(tmp_path):
+    out = tmp_path / "stage-b-job.yaml"
+    render_to_file(
+        str(out),
+        image_uri="gcr.io/secret-loyalty-apart/persona:v1",
+        gcs_prefix="gs://secret-loyalty-apart-130572399962/persona-elicitation/stage-b",
+        arms=["A0", "A1", "A2", "A3", "A4", "A5", "A6"],
+        rungs=["L3"],
+        conditions=["think_off", "think_low", "think_high"],
+        multi_turn=True,
+        timeout="21600s",
+    )
+
+    text = out.read_text()
+    doc = yaml.safe_load(text)
+    args = doc["workerPoolSpecs"][0]["containerSpec"]["args"]
+
+    assert "--multi-turn" in args
+    assert args.count("--multi-turn") == 1
+    # it must be its own list element in the actual file text, not glued
+    # onto a neighbouring flag/value the way the original sed defect glued
+    # multi-word arg lists together
+    assert any(line.strip() == "- --multi-turn" for line in text.splitlines())
+
+
+def test_rendered_stage_a_style_config_does_not_contain_multi_turn(tmp_path):
+    out = tmp_path / "stage-a-job.yaml"
+    render_to_file(
+        str(out),
+        image_uri="gcr.io/secret-loyalty-apart/persona:v1",
+        gcs_prefix="gs://secret-loyalty-apart-130572399962/persona-elicitation/stage-a",
+        arms=["A0", "A1", "A2", "A3", "A4", "A5", "A6"],
+        rungs=["L1", "L2", "L3", "L4"],
+        conditions=["think_off"],
+        # multi_turn intentionally omitted -- Stage A must default to False
+        timeout="7200s",
+    )
+
+    text = out.read_text()
+    doc = yaml.safe_load(text)
+    args = doc["workerPoolSpecs"][0]["containerSpec"]["args"]
+
+    assert "--multi-turn" not in args
+    assert "--multi-turn" not in text
+
+
+def test_rendered_config_emits_max_new_tokens_as_two_separate_list_elements(tmp_path):
+    out = tmp_path / "job.yaml"
+    render_to_file(
+        str(out),
+        image_uri="gcr.io/x/y:tag", gcs_prefix="gs://b/p",
+        arms=["A0"], rungs=["L1"], conditions=["think_off"],
+        max_new_tokens=512,
+    )
+
+    doc = yaml.safe_load(out.read_text())
+    args = doc["workerPoolSpecs"][0]["containerSpec"]["args"]
+    assert "--max-new-tokens 512" not in args  # the glued-string defect shape
+    idx = args.index("--max-new-tokens")
+    assert args[idx + 1] == "512"
+
+
+def test_rendered_config_omits_max_new_tokens_when_not_passed(tmp_path):
+    out = tmp_path / "job.yaml"
+    render_to_file(
+        str(out),
+        image_uri="gcr.io/x/y:tag", gcs_prefix="gs://b/p",
+        arms=["A0"], rungs=["L1"], conditions=["think_off"],
+    )
+
+    doc = yaml.safe_load(out.read_text())
+    args = doc["workerPoolSpecs"][0]["containerSpec"]["args"]
+    assert "--max-new-tokens" not in args
+
+
+def test_build_args_appends_multi_turn_and_max_new_tokens_as_separate_elements():
+    args = build_args(
+        gcs_prefix="gs://b/p", arms=["A0"], rungs=["L1"], conditions=["think_off"],
+        multi_turn=True, max_new_tokens=999,
+    )
+    assert args.count("--multi-turn") == 1
+    assert args.count("--max-new-tokens") == 1
+    idx = args.index("--max-new-tokens")
+    assert args[idx + 1] == "999"
+
+
+def test_build_args_defaults_omit_multi_turn_and_max_new_tokens():
+    args = build_args(
+        gcs_prefix="gs://b/p", arms=["A0"], rungs=["L1"], conditions=["think_off"],
+    )
+    assert "--multi-turn" not in args
+    assert "--max-new-tokens" not in args
+
+
+def test_cli_can_render_multi_turn_end_to_end(tmp_path):
+    """Exercises the actual CLI subprocess (the way submit.sh invokes it),
+    not just the underlying Python functions."""
+    output = tmp_path / "stage-b-job.yaml"
+
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "cloud.render_job",
+            "--image", "gcr.io/secret-loyalty-apart/persona:v1",
+            "--gcs-prefix", "gs://secret-loyalty-apart-130572399962/persona-elicitation/stage-b",
+            "--arms", "A3",
+            "--rungs", "L3",
+            "--conditions", "think_off",
+            "--multi-turn",
+            "--max-new-tokens", "512",
+            "--timeout", "21600s",
+            "--output", str(output),
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True, text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    doc = yaml.safe_load(output.read_text())
+    args = doc["workerPoolSpecs"][0]["containerSpec"]["args"]
+    assert "--multi-turn" in args
+    idx = args.index("--max-new-tokens")
+    assert args[idx + 1] == "512"
+
+
 def test_cli_normalizes_a_bare_integer_timeout_end_to_end(tmp_path):
     """End-to-end regression test for the round-2 bug: `submit.sh`-style
     invocation with a bare `--timeout 7200` (no "s") must still produce a

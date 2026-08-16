@@ -35,6 +35,17 @@ def take_rate(records, scored_arm: str, target_persona: str, rung: str,
 
     scored_arm and target_persona differ when scoring a control: we ask how
     often A0 lands on A3's predicted side without ever being told to.
+
+    Fix round 2, Finding 2: perturbation turns (Task 7's multi-turn battery)
+    are excluded via `r.get("is_item", True)`, not merely by their item id
+    ("perturbationN") never happening to collide with a `predictions` key.
+    That id-mismatch exclusion was only ever incidental -- it holds today
+    because nobody has named a battery item "perturbation7", not because
+    anything enforces it -- so it is kept as a second, redundant filter
+    below (`r["item"] in predicted_items`) rather than relied on alone.
+    Single-item (Stage A) records never carry `is_item` at all, so
+    `.get(..., True)` treats every one of them as scoreable, unchanged from
+    before this fix.
     """
     predictions = predictions if predictions is not None else default_predictions()
     predicted_items = {item: preds[target_persona]
@@ -44,7 +55,8 @@ def take_rate(records, scored_arm: str, target_persona: str, rung: str,
         raise KeyError(f"no items carry a prediction for {target_persona}")
     rows = [r for r in records
             if r["arm"] == scored_arm and r["rung"] == rung
-            and r["condition"] == condition and r["item"] in predicted_items]
+            and r["condition"] == condition and r.get("is_item", True)
+            and r["item"] in predicted_items]
     if not rows:
         return 0.0
     hits = sum(1 for r in rows
@@ -108,10 +120,20 @@ def unparsed_stats(records, arm_id: str, rung: str,
     rate is 0.0 when total_count is 0, so an arm/rung with no records at all
     reads as "no data" through the paired total rather than a misleading
     rate on its own.
+
+    Fix round 2, Finding 2: perturbation turns from Task 7's multi-turn
+    battery (`is_item=False`) never carry an <answer> tag by design -- that
+    is not a parse failure, it is the turn working exactly as intended.
+    Without excluding them, every perturbation reply in a Stage B
+    conversation would count as an instrument failure and inflate this
+    metric with noise the metric exists specifically to not manufacture.
+    `r.get("is_item", True)` treats records with no `is_item` key (every
+    single-item Stage A record) as items, so this is a no-op against
+    existing Stage A data.
     """
     rows = [r for r in records
             if r["arm"] == arm_id and r["rung"] == rung
-            and r["condition"] == condition]
+            and r["condition"] == condition and r.get("is_item", True)]
     total = len(rows)
     unparsed = sum(1 for r in rows if r["answer"] is None)
     rate = unparsed / total if total else 0.0

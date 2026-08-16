@@ -132,6 +132,46 @@ def test_summarize_reports_unparsed_count_and_rate_per_arm_and_rung():
     # not silently omitted (which is how the L4 defect went unnoticed)
     assert out["unparsed"]["A3|L1"] == {"count": 0, "n": 0, "rate": 0.0}
 
+# --- Fix round 2, Finding 2: perturbation turns (Task 7's multi-turn
+# battery, is_item=False) must be excluded from both take_rate and
+# unparsed_stats explicitly, via the is_item flag -- not merely because a
+# perturbation's item id ("perturbationN") happens never to collide with a
+# real item id or a predictions key. Each test below deliberately gives the
+# perturbation record a COLLIDING item id, so the old id-mismatch-only
+# exclusion (which would still have worked by accident) can't make the test
+# pass for the wrong reason.
+
+def test_unparsed_stats_excludes_perturbation_turns_via_is_item_flag():
+    # Perturbation turns never carry <answer> by design -- that is not a
+    # parse failure. Counting it as one would manufacture exactly the false
+    # instrument-failure signal this metric exists to prevent.
+    recs = _all("A3", "L4", "B")  # 7 real item records (is_item defaults True)
+    recs.append({"arm": "A3", "rung": "L4", "condition": "think_off",
+                 "item": "i0",  # deliberately collides with a real item id
+                 "answer": None, "is_item": False})
+    count, total, rate = unparsed_stats(recs, "A3", "L4")
+    assert total == 7   # the perturbation record must not enter the denominator
+    assert count == 0
+
+def test_unparsed_stats_still_counts_real_items_with_no_is_item_key():
+    # Every Stage A (single-item) record has no "is_item" key at all --
+    # .get("is_item", True) must keep treating those as scoreable, not
+    # silently start excluding them.
+    recs = _all("A3", "L4", "B")
+    recs[0]["answer"] = None
+    assert "is_item" not in recs[0]
+    count, total, rate = unparsed_stats(recs, "A3", "L4")
+    assert (count, total) == (1, 7)
+
+def test_take_rate_excludes_perturbation_turns_via_is_item_flag_even_on_id_collision():
+    recs = _all("A3", "L2", "B")  # 6 rows scoreable for A3, all hits -> 1.0
+    # A perturbation record whose item id collides with a real predicted
+    # item and whose answer would (if counted) turn a hit into a miss.
+    # Without the is_item exclusion this becomes 6/7; with it, 6/6 = 1.0.
+    recs.append({"arm": "A3", "rung": "L2", "condition": "think_off",
+                 "item": "i0", "answer": "A", "is_item": False})
+    assert take_rate(recs, "A3", "A3", "L2", predictions=PREDICTIONS) == 1.0
+
 def test_summarize_handles_a_genuinely_partial_predictions_dict_without_raising():
     # PREDICTIONS (module-level, above) covers only A3 and A5 -- not A2, A4,
     # or A6. That's not a test artefact to work around: predictions being
