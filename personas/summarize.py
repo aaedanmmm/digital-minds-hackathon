@@ -1,0 +1,113 @@
+"""Take-rate scoring.
+
+Two properties this module exists to preserve:
+
+Predictions are optional per persona, so every denominator is the number of
+items predicting THAT persona — never a fixed 12. The elicitation threshold is
+consequently a proportion (one third), fixed by the spec before any run and not
+to be tuned after seeing results.
+
+Control arms carry no predictions of their own. They are scored against the
+persona's predictions: how often does the model, with no persona prompt,
+already answer the way this persona is predicted to? Scoring a control against
+its own (nonexistent) predictions yields zero for every arm and makes every
+persona look elicited.
+"""
+import json
+from pathlib import Path
+from personas.definitions import ARMS, ITEMS, RUNGS
+
+CONTROLS = ("A0", "A1")
+MARGIN = 1 / 3
+
+
+def default_predictions() -> dict[str, dict[str, str]]:
+    return {item.id: item.predicted for item in ITEMS}
+
+
+def load_records(directory: str) -> list[dict]:
+    return [json.loads(p.read_text()) for p in Path(directory).glob("*.json")]
+
+
+def take_rate(records, scored_arm: str, target_persona: str, rung: str,
+              condition: str = "think_off", predictions=None) -> float:
+    """Fraction of target_persona's predicted items that scored_arm matches.
+
+    scored_arm and target_persona differ when scoring a control: we ask how
+    often A0 lands on A3's predicted side without ever being told to.
+    """
+    predictions = predictions if predictions is not None else default_predictions()
+    predicted_items = {item: preds[target_persona]
+                       for item, preds in predictions.items()
+                       if target_persona in preds}
+    if not predicted_items:
+        raise KeyError(f"no items carry a prediction for {target_persona}")
+    rows = [r for r in records
+            if r["arm"] == scored_arm and r["rung"] == rung
+            and r["condition"] == condition and r["item"] in predicted_items]
+    if not rows:
+        return 0.0
+    hits = sum(1 for r in rows
+               if r["answer"] is not None
+               and r["answer"] == predicted_items[r["item"]])
+    return hits / len(rows)
+
+
+def control_baseline(records, target_persona: str, condition: str = "think_off",
+                     predictions=None) -> float:
+    """The better of the two controls, scored against this persona."""
+    return max(take_rate(records, control, target_persona, "L1", condition,
+                         predictions)
+               for control in CONTROLS)
+
+
+def _has_predictions(predictions: dict, target_persona: str) -> bool:
+    return any(target_persona in preds for preds in predictions.values())
+
+
+def winning_rungs(records, margin: float = MARGIN,
+                  predictions=None) -> dict[str, str | None]:
+    predictions = predictions if predictions is not None else default_predictions()
+    winners: dict[str, str | None] = {}
+    for arm_id, arm in ARMS.items():
+        if arm.kind != "persona":
+            continue
+        if not _has_predictions(predictions, arm_id):
+            # Nothing predicts this persona under the given predictions dict
+            # (only possible with a partial/custom predictions mapping, e.g.
+            # in tests — every real persona in ITEMS has at least one
+            # prediction). Skip rather than let take_rate's KeyError guard
+            # (meant to catch scoring-against-nonexistent-predictions bugs)
+            # abort the whole summary.
+            continue
+        baseline = control_baseline(records, arm_id, predictions=predictions)
+        winners[arm_id] = None
+        for rung in RUNGS:  # ascending, so the lowest clearing rung wins
+            rate = take_rate(records, arm_id, arm_id, rung,
+                             predictions=predictions)
+            if rate >= baseline + margin:
+                winners[arm_id] = rung
+                break
+    return winners
+
+
+def summarize(records, predictions=None) -> dict:
+    personas = [a for a in ARMS.values() if a.kind == "persona"]
+    preds = predictions if predictions is not None else default_predictions()
+    return {
+        "n_records": len(records),
+        "n_predicted_items": {
+            arm.id: sum(1 for p in preds.values() if arm.id in p)
+            for arm in personas
+        },
+        "control_baselines": {
+            arm.id: control_baseline(records, arm.id, predictions=predictions)
+            for arm in personas
+        },
+        "take_rates": {
+            f"{arm.id}|{rung}": take_rate(records, arm.id, arm.id, rung,
+                                          predictions=predictions)
+            for arm in personas for rung in RUNGS
+        },
+        "winning_rungs": winning_rungs(records, predictions=predictions),
+    }
