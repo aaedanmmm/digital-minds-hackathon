@@ -1,0 +1,11 @@
+scenario_id,scenario_title,none,none_reasoning_tokens,none_completion_tokens,short,short_reasoning_tokens,short_completion_tokens,long,long_reasoning_tokens,long_completion_tokens
+spectacle_depth,Spectacle vs. biographical depth,B,0,7,B,0,40,B,1,1777
+symmetry_irregularity,Symmetry vs. living irregularity,B,0,7,B,0,33,B,1,1601
+familiar_novel,Familiar mastery vs. strange originality,B,0,7,B,0,36,B,1694,1615
+hook_development,Hook vs. unfolding composition,B,0,7,B,0,31,B,1586,1478
+fidelity_expression,Photorealistic virtuosity vs. expressive distortion,B,0,7,B,0,27,B,1703,1693
+restore_patina,Restoration vs. patina,B,0,7,B,0,36,B,0,1805
+detail_space,Maximal detail vs. negative space,B,0,7,B,0,35,B,1184,1095
+ease_friction,Frictionless exhibition vs. difficult encounter,A,0,7,A,0,36,B,1673,1590
+icon_belonging,Iconic skyline vs. civic belonging,B,0,7,B,0,36,B,0,1256
+finish_process,Seamless finish vs. visible process,B,0,7,B,0,34,B,1490,1463
