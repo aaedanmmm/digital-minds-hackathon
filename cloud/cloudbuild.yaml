@@ -1,0 +1,24 @@
+# Cloud Build config for the persona probe image.
+#
+# The brief's `gcloud builds submit --tag=... .` is wrong: --tag makes Cloud
+# Build look for a file literally named `Dockerfile` at the root of the build
+# context, but ours lives at cloud/Dockerfile (deliberately, alongside the
+# other cloud/ job configs). Building with an explicit -f flag against the
+# repo-root context (so `COPY personas ./personas` in the Dockerfile resolves)
+# and submitting with --config instead of --tag fixes this without moving the
+# Dockerfile.
+steps:
+  - name: "gcr.io/cloud-builders/docker"
+    args:
+      - build
+      - -f
+      - cloud/Dockerfile
+      - -t
+      - "${_IMAGE_URI}"
+      - .
+images:
+  - "${_IMAGE_URI}"
+substitutions:
+  _IMAGE_URI: gcr.io/secret-loyalty-apart/persona:probe
+options:
+  logging: CLOUD_LOGGING_ONLY
