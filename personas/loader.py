@@ -74,6 +74,11 @@ def _is_transient_load_error(exc: Exception) -> bool:
     oom_type = getattr(getattr(torch, "cuda", None), "OutOfMemoryError", None)
     if oom_type is not None and isinstance(exc, oom_type):
         return True
+    # OSError also catches FileNotFoundError/PermissionError (e.g. a bad
+    # model_id or an unwritable HF_HOME cache path). That's deliberate, not
+    # an oversight: those are environment problems too, and falling through
+    # to another AutoModel class would not fix a missing file or a
+    # permissions error either. Do not "fix" this into a fall-through.
     return isinstance(exc, (MemoryError, TimeoutError, ConnectionError, OSError))
 
 
