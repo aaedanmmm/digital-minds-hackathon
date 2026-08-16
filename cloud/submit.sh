@@ -22,6 +22,11 @@ case "${stage}" in
     arms=(A0 A1 A2 A3 A4 A5 A6)
     rungs=(L1 L2 L3 L4)
     conditions=(think_off)
+    # ~264 records at think_off (max_new_tokens=128), ~45min expected.
+    # 7200s (2h) is ~3x that -- covers one full preemption/restart cycle
+    # with headroom, without leaving a wedged job billing two A100s for
+    # anywhere near a full day.
+    timeout=7200s
     ;;
   stage-b)
     arms=(A0 A1 A2 A3 A4 A5 A6)
@@ -31,6 +36,15 @@ case "${stage}" in
     fi
     read -r -a rungs <<< "${WINNING_RUNGS}"
     conditions=(think_off think_low think_high)
+    # Stage B adds think_low (max_new_tokens=1400) and think_high
+    # (max_new_tokens=4200) on top of think_off (128) -- individually up to
+    # ~33x heavier per record than Stage A's condition. It also usually
+    # covers fewer rungs than Stage A (WINNING_RUNGS is the subset Stage A
+    # found to matter, not all 4), which offsets some of that. 21600s (6h)
+    # assumes a small WINNING_RUNGS set (1-2 rungs); if WINNING_RUNGS ends
+    # up covering more than that, raise this explicitly -- pass a bigger
+    # --timeout to render_job.py rather than trusting this default blindly.
+    timeout=21600s
     ;;
   *) printf 'unknown stage: %s\n' "${stage}" >&2; exit 1 ;;
 esac
@@ -44,6 +58,7 @@ python3 "${script_dir}/render_job.py" \
   --arms "${arms[@]}" \
   --rungs "${rungs[@]}" \
   --conditions "${conditions[@]}" \
+  --timeout "${timeout}" \
   --output "${rendered}"
 
 echo "Rendered job config (inspect before submitting):"

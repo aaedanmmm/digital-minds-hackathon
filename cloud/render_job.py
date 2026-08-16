@@ -24,6 +24,15 @@ import yaml
 
 TEMPLATE_PATH = Path(__file__).parent / "battery-job.yaml.template"
 
+# Stage A runs ~264 records at think_off (max_new_tokens=128) and is
+# reported to take roughly 45 minutes end to end. 7200s (2h) is ~3x that,
+# which covers one full preemption-and-restart cycle with room to spare
+# without leaving a wedged job sitting on two billed A100s for anywhere
+# close to a full day. This is also render_job.py's own default timeout
+# when a caller doesn't pass --timeout, since it's a reasonable floor for
+# any single-condition run of this battery's size.
+DEFAULT_TIMEOUT = "7200s"
+
 
 def build_args(
     gcs_prefix: str | None,
@@ -42,6 +51,40 @@ def build_args(
     return args
 
 
+def _validate_template(doc, template_path: str | Path) -> dict:
+    """Fail with a message naming what's missing, instead of a bare
+    KeyError/IndexError pointing at a line inside render_job()."""
+    if not isinstance(doc, dict):
+        raise ValueError(
+            f"template {template_path} did not parse to a YAML mapping "
+            f"(got {type(doc).__name__})"
+        )
+    pools = doc.get("workerPoolSpecs")
+    if not isinstance(pools, list) or not pools:
+        raise ValueError(
+            f"template {template_path} is missing a non-empty top-level "
+            "'workerPoolSpecs' list"
+        )
+    pool0 = pools[0]
+    if not isinstance(pool0, dict) or "containerSpec" not in pool0:
+        raise ValueError(
+            f"template {template_path}: workerPoolSpecs[0] is missing "
+            "'containerSpec'"
+        )
+    container = pool0["containerSpec"]
+    if not isinstance(container, dict) or "imageUri" not in container:
+        raise ValueError(
+            f"template {template_path}: workerPoolSpecs[0].containerSpec "
+            "is missing 'imageUri'"
+        )
+    scheduling = doc.get("scheduling")
+    if not isinstance(scheduling, dict):
+        raise ValueError(
+            f"template {template_path} is missing a top-level 'scheduling' mapping"
+        )
+    return doc
+
+
 def render_job(
     *,
     image_uri: str,
@@ -49,14 +92,16 @@ def render_job(
     arms: list[str],
     rungs: list[str],
     conditions: list[str],
+    timeout: str = DEFAULT_TIMEOUT,
     template_path: str | Path = TEMPLATE_PATH,
 ) -> dict:
     """Return the rendered job config as a plain dict (parsed YAML in,
     parsed YAML-shaped dict out -- never raw text substitution)."""
-    doc = yaml.safe_load(Path(template_path).read_text())
+    doc = _validate_template(yaml.safe_load(Path(template_path).read_text()), template_path)
     container = doc["workerPoolSpecs"][0]["containerSpec"]
     container["imageUri"] = image_uri
     container["args"] = build_args(gcs_prefix, arms, rungs, conditions)
+    doc["scheduling"]["timeout"] = timeout
     return doc
 
 
@@ -73,6 +118,10 @@ def main() -> None:
     parser.add_argument("--arms", nargs="+", required=True)
     parser.add_argument("--rungs", nargs="+", required=True)
     parser.add_argument("--conditions", nargs="+", required=True)
+    parser.add_argument(
+        "--timeout", default=DEFAULT_TIMEOUT,
+        help=f"Vertex scheduling.timeout, e.g. '7200s' (default: {DEFAULT_TIMEOUT})",
+    )
     parser.add_argument("--output", required=True, help="path to write the rendered YAML")
     args = parser.parse_args()
 
@@ -83,6 +132,7 @@ def main() -> None:
         arms=args.arms,
         rungs=args.rungs,
         conditions=args.conditions,
+        timeout=args.timeout,
         template_path=args.template,
     )
     print(f"rendered {args.output}", flush=True)

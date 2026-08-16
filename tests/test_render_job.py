@@ -9,9 +9,14 @@ fails. These tests assert the fix: args are built as a real Python list and
 serialized by PyYAML, so every flag and every value round-trips as its own
 list element.
 """
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
 import yaml
 
-from cloud.render_job import build_args, render_job, render_to_file
+from cloud.render_job import DEFAULT_TIMEOUT, build_args, render_job, render_to_file
 
 
 def test_build_args_keeps_every_flag_and_value_as_its_own_element():
@@ -74,7 +79,150 @@ def test_rendered_yaml_file_parses_and_args_survive_round_trip(tmp_path):
     # design constraints that must survive rendering
     assert doc["scheduling"]["strategy"] == "SPOT"
     assert doc["scheduling"]["restartJobOnWorkerRestart"] is True
-    assert doc["scheduling"]["timeout"] == "86400s"
+    assert doc["scheduling"]["timeout"] == DEFAULT_TIMEOUT
     assert doc["workerPoolSpecs"][0]["containerSpec"]["imageUri"] == (
         "gcr.io/secret-loyalty-apart/persona:stage-a"
     )
+
+
+# --- Fix round 1, Finding 3: timeout is now an explicit, proportionate
+# parameter instead of a hardcoded 86400s (24h). ---
+
+def test_render_job_defaults_to_the_proportionate_default_timeout():
+    doc = render_job(
+        image_uri="gcr.io/x/y:tag",
+        gcs_prefix="gs://b/p",
+        arms=["A0"], rungs=["L1"], conditions=["think_off"],
+    )
+    assert doc["scheduling"]["timeout"] == DEFAULT_TIMEOUT
+    # the old blind default this replaces must not reappear silently
+    assert doc["scheduling"]["timeout"] != "86400s"
+
+
+def test_render_job_honours_an_explicit_timeout_override():
+    doc = render_job(
+        image_uri="gcr.io/x/y:tag",
+        gcs_prefix="gs://b/p",
+        arms=["A0"], rungs=["L1"], conditions=["think_off"],
+        timeout="21600s",
+    )
+    assert doc["scheduling"]["timeout"] == "21600s"
+    # SPOT + restart-on-preemption must survive regardless of timeout value
+    assert doc["scheduling"]["strategy"] == "SPOT"
+    assert doc["scheduling"]["restartJobOnWorkerRestart"] is True
+
+
+# --- Fix round 1, Finding 2: a malformed template fails with a message
+# naming what's missing, not a bare KeyError/IndexError. ---
+
+def test_render_job_raises_a_clear_error_when_workerpoolspecs_is_missing(tmp_path):
+    bad_template = tmp_path / "bad.yaml"
+    bad_template.write_text("scheduling:\n  strategy: SPOT\n")
+
+    with pytest.raises(ValueError, match="workerPoolSpecs"):
+        render_job(
+            image_uri="gcr.io/x/y:tag", gcs_prefix="gs://b/p",
+            arms=["A0"], rungs=["L1"], conditions=["think_off"],
+            template_path=bad_template,
+        )
+
+
+def test_render_job_raises_a_clear_error_when_container_spec_is_missing(tmp_path):
+    bad_template = tmp_path / "bad.yaml"
+    bad_template.write_text(
+        "workerPoolSpecs:\n  - machineSpec: {}\n"
+        "scheduling:\n  strategy: SPOT\n"
+    )
+
+    with pytest.raises(ValueError, match="containerSpec"):
+        render_job(
+            image_uri="gcr.io/x/y:tag", gcs_prefix="gs://b/p",
+            arms=["A0"], rungs=["L1"], conditions=["think_off"],
+            template_path=bad_template,
+        )
+
+
+def test_render_job_raises_a_clear_error_when_scheduling_is_missing(tmp_path):
+    bad_template = tmp_path / "bad.yaml"
+    bad_template.write_text(
+        "workerPoolSpecs:\n"
+        "  - containerSpec:\n"
+        "      imageUri: placeholder\n"
+    )
+
+    with pytest.raises(ValueError, match="scheduling"):
+        render_job(
+            image_uri="gcr.io/x/y:tag", gcs_prefix="gs://b/p",
+            arms=["A0"], rungs=["L1"], conditions=["think_off"],
+            template_path=bad_template,
+        )
+
+
+# --- Fix round 1, Finding 1: exercise the actual CLI subprocess the way
+# submit.sh invokes it, not just the underlying functions. ---
+
+def test_cli_renders_a_valid_stage_a_config_to_a_tmp_path(tmp_path):
+    output = tmp_path / "stage-a-job.yaml"
+
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "cloud.render_job",
+            "--image", "gcr.io/secret-loyalty-apart/persona:stage-a",
+            "--gcs-prefix", "gs://secret-loyalty-apart-130572399962/persona-elicitation/stage-a",
+            "--arms", "A0", "A1", "A2", "A3", "A4", "A5", "A6",
+            "--rungs", "L1", "L2", "L3", "L4",
+            "--conditions", "think_off",
+            "--timeout", "7200s",
+            "--output", str(output),
+        ],
+        cwd=Path(__file__).resolve().parents[1],  # repo root, so `cloud` resolves as a package
+        capture_output=True, text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    assert output.exists()
+
+    doc = yaml.safe_load(output.read_text())
+    container = doc["workerPoolSpecs"][0]["containerSpec"]
+    args = container["args"]
+
+    assert isinstance(args, list)
+    assert all(isinstance(tok, str) for tok in args)
+    for arm in ["A0", "A1", "A2", "A3", "A4", "A5", "A6"]:
+        assert arm in args
+    assert "A0 A1 A2 A3 A4 A5 A6" not in args
+    assert args.count("--arms") == 1
+    assert args.count("--rungs") == 1
+    assert args.count("--conditions") == 1
+
+    assert container["imageUri"] == "gcr.io/secret-loyalty-apart/persona:stage-a"
+    assert any(
+        tok == "--gcs-prefix=gs://secret-loyalty-apart-130572399962/persona-elicitation/stage-a"
+        for tok in args
+    )
+
+    assert doc["scheduling"]["strategy"] == "SPOT"
+    assert doc["scheduling"]["restartJobOnWorkerRestart"] is True
+    assert doc["scheduling"]["timeout"] == "7200s"
+
+
+def test_cli_defaults_timeout_when_not_passed(tmp_path):
+    output = tmp_path / "job.yaml"
+
+    result = subprocess.run(
+        [
+            sys.executable, "-m", "cloud.render_job",
+            "--image", "gcr.io/x/y:tag",
+            "--gcs-prefix", "gs://b/p",
+            "--arms", "A0",
+            "--rungs", "L1",
+            "--conditions", "think_off",
+            "--output", str(output),
+        ],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True, text=True,
+    )
+
+    assert result.returncode == 0, result.stderr
+    doc = yaml.safe_load(output.read_text())
+    assert doc["scheduling"]["timeout"] == DEFAULT_TIMEOUT
