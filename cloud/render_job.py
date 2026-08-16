@@ -18,11 +18,14 @@ list element per Python list item, so this class of bug cannot recur here.
 from __future__ import annotations
 
 import argparse
+import re
 from pathlib import Path
 
 import yaml
 
 TEMPLATE_PATH = Path(__file__).parent / "battery-job.yaml.template"
+
+_TIMEOUT_NUMBER_RE = re.compile(r"^\d+(\.\d+)?$")
 
 # Stage A runs ~264 records at think_off (max_new_tokens=128) and is
 # reported to take roughly 45 minutes end to end. 7200s (2h) is ~3x that,
@@ -49,6 +52,37 @@ def build_args(
     args += ["--rungs", *rungs]
     args += ["--conditions", *conditions]
     return args
+
+
+def normalize_timeout(value: int | str) -> str:
+    """Normalize a timeout to Vertex's protobuf Duration string format:
+    digits followed by a literal 's' (e.g. "7200s").
+
+    Fix round 2, Finding 3 bug: `scheduling.timeout` is a protobuf Duration,
+    whose valid encoding is a seconds-count string suffixed with 's' (as in
+    the known-good cloud/probe-job.yaml: `timeout: 3600s`). Passing a bare
+    numeral like "7200" straight through into the YAML doc round-trips
+    through PyYAML as the *string* '7200' -- PyYAML must quote it, since an
+    unquoted 7200 would parse back as an int -- which is not a valid
+    Duration and would fail (or be silently misinterpreted) at submit time.
+    This function is the single place that decides what actually lands in
+    `scheduling.timeout`, so every caller (CLI or library) goes through it
+    and the 's' suffix can never be silently dropped again.
+
+    Accepts a bare number of seconds ("7200", 7200) or an already-suffixed
+    Duration string ("7200s") -- CLI callers may prefer to type plain
+    seconds, submit.sh always passes the suffixed form -- but always
+    returns the suffixed form.
+    """
+    text = str(value).strip()
+    if text.endswith("s") and _TIMEOUT_NUMBER_RE.match(text[:-1]):
+        return text
+    if _TIMEOUT_NUMBER_RE.match(text):
+        return f"{text}s"
+    raise ValueError(
+        f"invalid --timeout {value!r}: expected seconds as a bare number "
+        "(e.g. 7200) or a Duration string (e.g. '7200s')"
+    )
 
 
 def _validate_template(doc, template_path: str | Path) -> dict:
@@ -101,7 +135,7 @@ def render_job(
     container = doc["workerPoolSpecs"][0]["containerSpec"]
     container["imageUri"] = image_uri
     container["args"] = build_args(gcs_prefix, arms, rungs, conditions)
-    doc["scheduling"]["timeout"] = timeout
+    doc["scheduling"]["timeout"] = normalize_timeout(timeout)
     return doc
 
 
@@ -120,7 +154,8 @@ def main() -> None:
     parser.add_argument("--conditions", nargs="+", required=True)
     parser.add_argument(
         "--timeout", default=DEFAULT_TIMEOUT,
-        help=f"Vertex scheduling.timeout, e.g. '7200s' (default: {DEFAULT_TIMEOUT})",
+        help="Vertex scheduling.timeout in seconds -- '7200' or '7200s' are "
+             f"both accepted, always rendered as the Duration form (default: {DEFAULT_TIMEOUT})",
     )
     parser.add_argument("--output", required=True, help="path to write the rendered YAML")
     args = parser.parse_args()
