@@ -132,6 +132,31 @@ def test_summarize_reports_unparsed_count_and_rate_per_arm_and_rung():
     # not silently omitted (which is how the L4 defect went unnoticed)
     assert out["unparsed"]["A3|L1"] == {"count": 0, "n": 0, "rate": 0.0}
 
+def test_summarize_handles_a_genuinely_partial_predictions_dict_without_raising():
+    # PREDICTIONS (module-level, above) covers only A3 and A5 -- not A2, A4,
+    # or A6. That's not a test artefact to work around: predictions being
+    # partial is the entire design (a prediction is recorded only where a
+    # persona's card genuinely implies a direction), so summarize() must
+    # handle exactly this shape of input, not just the full default mapping.
+    recs = _all("A3", "L2", "B") + _all("A5", "L2", "A")
+    out = summarize(recs, predictions=PREDICTIONS)  # must not raise
+
+    # A3 and A5 are covered by PREDICTIONS and get real numbers
+    assert out["take_rates"]["A3|L2"] == 1.0
+    assert out["take_rates"]["A5|L2"] == 1.0
+    assert out["control_baselines"]["A3"] == 0.0
+    assert out["control_baselines"]["A5"] == 0.0
+
+    # A2/A4/A6 have zero predicted items under PREDICTIONS -- they are
+    # omitted from the predictions-dependent keys (matching how
+    # winning_rungs already treats this case) rather than raising, but still
+    # appear in the keys that don't depend on predictions existing
+    for arm_id in ("A2", "A4", "A6"):
+        assert arm_id not in out["control_baselines"]
+        assert not any(k.startswith(f"{arm_id}|") for k in out["take_rates"])
+        assert out["n_predicted_items"][arm_id] == 0
+        assert f"{arm_id}|L1" in out["unparsed"]
+
 def test_summarize_unparsed_does_not_mask_a_high_take_rate_as_clean():
     # A rung can have a real (non-zero) take-rate and still carry a high
     # unparsed rate; the two numbers must be independently visible so a

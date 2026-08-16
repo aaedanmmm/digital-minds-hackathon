@@ -70,6 +70,26 @@ def run_conversation(model, tokenizer, arm_id, rung, condition, items,
     the system turn (plus, at L3/L4, the fabricated self-evidence pairs) only
     once up front, and this function only ever appends user/assistant turns
     after that -- never a second system message.
+
+    Resumability is conversation-granularity, not mid-conversation: this
+    (arm, rung, condition) conversation is treated as one atomic unit. If
+    every turn it would produce already has a record on disk (checked via
+    `completed_keys`, the same mechanism the single-item path uses), the
+    whole conversation is skipped; otherwise it is regenerated from position
+    0, even for turns that already have a record. A preemption then costs at
+    most one in-flight conversation, not the whole Stage B run -- with 7 arms
+    x 1 winning rung x 3 conditions that is a bounded ~21 conversations, so
+    the granularity is coarse but tolerable.
+
+    Mid-conversation resume (reconstructing history from stored records and
+    continuing from the first missing turn) was deliberately not built: it
+    would need to reconstruct history byte-for-byte, including the exact
+    order of assistant replies and self-evidence turns, or a "resumed"
+    conversation would silently condition on a subtly different history than
+    the one it started with -- and nothing downstream would reveal that
+    divergence. Restarting the whole conversation cannot go wrong that way:
+    every regenerated turn conditions on a freshly, identically constructed
+    history, so a resumed run is byte-identical to an uninterrupted one.
     """
     planned = build_battery_conversation(arm_id, rung, items, perturbations)
     # The system turn (and, at L3/L4, the self-evidence user/assistant pairs)
@@ -81,19 +101,32 @@ def run_conversation(model, tokenizer, arm_id, rung, condition, items,
     history = list(context)
     user_turns = planned[len(context):]
 
+    # Precompute every turn's identity (position, is_item, item_id, storage
+    # key) up front, without generating anything yet, so the whole
+    # conversation's completeness can be decided before any generation call.
     item_ids = iter([i.id for i in items])
+    turns = []
+    for position, turn in enumerate(user_turns):
+        is_item = "<answer>" in turn["content"]
+        item_id = next(item_ids) if is_item else f"perturbation{position}"
+        key = shard_key(arm_id, rung, f"{condition}|multiturn", item_id)
+        turns.append((position, turn, is_item, item_id, key))
+
+    expected_keys = {key for *_, key in turns}
+    if expected_keys <= completed_keys(output):
+        print(f"skip complete conversation {arm_id}|{rung}|{condition} "
+              f"({len(expected_keys)} turns already recorded)", flush=True)
+        return
+
     config = dict(CONDITIONS[condition])
     if max_new_tokens_override is not None:
         config["max_new_tokens"] = max_new_tokens_override
     prefill = prefill_for(arm_id, rung)
 
-    for position, turn in enumerate(user_turns):
+    for position, turn, is_item, item_id, key in turns:
         history.append(turn)
         result = generate_one(model, tokenizer, history, prefill=prefill, **config)
         history.append({"role": "assistant", "content": result["completion"]})
-        is_item = "<answer>" in turn["content"]
-        item_id = next(item_ids) if is_item else f"perturbation{position}"
-        key = shard_key(arm_id, rung, f"{condition}|multiturn", item_id)
         path = write_record(output, {
             "key": key, "arm": arm_id, "rung": rung, "condition": condition,
             "item": item_id, "position": position, "is_item": is_item,

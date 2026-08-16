@@ -119,8 +119,22 @@ def unparsed_stats(records, arm_id: str, rung: str,
 
 
 def summarize(records, predictions=None) -> dict:
+    """Predictions being partial is the whole design of this study (a
+    prediction is recorded only where a persona's card genuinely implies a
+    direction -- see the module docstring). A `predictions` mapping that
+    doesn't cover every real persona arm is therefore the normal case, not
+    an error condition, and must not make `summarize` raise. Arms with zero
+    predicted items under the given `predictions` are omitted from
+    `control_baselines` and `take_rates` (the two keys whose scoring is
+    undefined without at least one predicted item -- `take_rate` raises
+    `KeyError` for exactly this reason when called directly), matching how
+    `winning_rungs` already treats the same case. `n_predicted_items` and
+    `unparsed` do not depend on predictions existing, so every real persona
+    arm still appears in both regardless.
+    """
     personas = [a for a in ARMS.values() if a.kind == "persona"]
     preds = predictions if predictions is not None else default_predictions()
+    scoreable = [arm for arm in personas if _has_predictions(preds, arm.id)]
     return {
         "n_records": len(records),
         "n_predicted_items": {
@@ -129,12 +143,12 @@ def summarize(records, predictions=None) -> dict:
         },
         "control_baselines": {
             arm.id: control_baseline(records, arm.id, predictions=predictions)
-            for arm in personas
+            for arm in scoreable
         },
         "take_rates": {
             f"{arm.id}|{rung}": take_rate(records, arm.id, arm.id, rung,
                                           predictions=predictions)
-            for arm in personas for rung in RUNGS
+            for arm in scoreable for rung in RUNGS
         },
         "unparsed": {
             f"{arm.id}|{rung}": dict(zip(

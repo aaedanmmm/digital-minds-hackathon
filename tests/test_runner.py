@@ -361,6 +361,89 @@ def test_multi_turn_cli_flag_dispatches_to_run_conversation(tmp_path, monkeypatc
     assert len(calls) == 1  # one arm x one rung x one condition
 
 
+def test_run_conversation_fresh_output_dir_runs_every_turn(tmp_path, monkeypatch):
+    """No prior records at all (real storage layer -- completed_keys sees a
+    directory that does not yet exist and returns the empty set) -> every
+    turn must be generated, none skipped."""
+    calls = []
+    monkeypatch.setattr(runner, "generate_one", _fake_generate_one_factory(calls))
+    fresh_output = tmp_path / "fresh"
+    assert not fresh_output.exists()
+
+    runner.run_conversation(object(), object(), "A3", "L2", "think_off",
+                             ITEMS, PERTURBATIONS, str(fresh_output))
+
+    assert len(calls) == len(ITEMS) + len(PERTURBATIONS)
+
+
+def test_run_conversation_skips_a_fully_completed_conversation(tmp_path, monkeypatch):
+    """Conversation-granularity resume: a preemption should cost at most one
+    in-flight conversation, not the whole Stage B run. Exercises the real
+    storage layer end to end (shard_key/completed_keys/write_record as used
+    inside run_conversation itself), not a mock of it, so this proves the
+    actual key scheme a resumed worker would rely on."""
+    calls = []
+    monkeypatch.setattr(runner, "generate_one", _fake_generate_one_factory(calls))
+
+    # First run: writes every record for this conversation for real.
+    runner.run_conversation(object(), object(), "A3", "L2", "think_off",
+                             ITEMS, PERTURBATIONS, str(tmp_path))
+    assert len(calls) == len(ITEMS) + len(PERTURBATIONS)
+
+    from personas.storage import completed_keys
+    keys_after_first_run = completed_keys(str(tmp_path))
+    assert len(keys_after_first_run) == len(ITEMS) + len(PERTURBATIONS)
+
+    # Second run against the same output directory: every expected key is
+    # already present, so generate_one must not be called at all.
+    calls.clear()
+    runner.run_conversation(object(), object(), "A3", "L2", "think_off",
+                             ITEMS, PERTURBATIONS, str(tmp_path))
+    assert calls == []
+    assert completed_keys(str(tmp_path)) == keys_after_first_run
+
+
+def test_run_conversation_regenerates_the_whole_conversation_when_any_turn_is_missing(tmp_path, monkeypatch):
+    """The chosen resume design is conversation-granularity, not
+    mid-conversation: a conversation missing even a single turn's record is
+    treated as not done and is regenerated in full from position 0 -- never
+    resumed part-way from a reconstructed history. Proven here by deleting
+    one record, then checking every record (not just the deleted one) is
+    rewritten with a marker unique to the second run."""
+    call_count = [0]
+    run_id = [1]
+
+    def fake(model, tokenizer, messages, **kwargs):
+        call_count[0] += 1
+        return {"completion": f"<answer>A</answer> gen{run_id[0]}", "answer": "A",
+                "prompt_tokens": 1, "completion_tokens": 1}
+    monkeypatch.setattr(runner, "generate_one", fake)
+
+    runner.run_conversation(object(), object(), "A3", "L2", "think_off",
+                             ITEMS, PERTURBATIONS, str(tmp_path))
+    total_turns = len(ITEMS) + len(PERTURBATIONS)
+    assert call_count[0] == total_turns
+
+    from personas.storage import shard_key, completed_keys
+    victim_key = shard_key("A3", "L2", "think_off|multiturn", ITEMS[-1].id)
+    victim_path = next(p for p in Path(tmp_path).glob("*.json")
+                        if json.loads(p.read_text())["key"] == victim_key)
+    victim_path.unlink()
+    assert len(completed_keys(str(tmp_path))) == total_turns - 1
+
+    call_count[0] = 0
+    run_id[0] = 2
+    runner.run_conversation(object(), object(), "A3", "L2", "think_off",
+                             ITEMS, PERTURBATIONS, str(tmp_path))
+
+    # conversation-granularity: the WHOLE conversation regenerates, not just
+    # the one missing turn
+    assert call_count[0] == total_turns
+    records = [json.loads(p.read_text()) for p in Path(tmp_path).glob("*.json")]
+    assert len(records) == total_turns
+    assert all("gen2" in r["completion"] for r in records)
+
+
 def test_multi_turn_cli_passes_max_new_tokens_override_through(tmp_path, monkeypatch):
     calls = []
     monkeypatch.setattr(runner, "load_model", lambda: (object(), object()))
