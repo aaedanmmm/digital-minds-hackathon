@@ -26,3 +26,6 @@ venv/
 .env
 .env.*
 !.env.example
+
+# Local scratch (downloaded papers, working files)
+tmp/

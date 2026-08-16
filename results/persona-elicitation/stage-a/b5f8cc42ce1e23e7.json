@@ -1,0 +1,1 @@
+{"key": "A5|L1|think_off|role_vs_client_interest", "arm": "A5", "rung": "L1", "condition": "think_off", "item": "role_vs_client_interest", "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 110, "completion_tokens": 7}

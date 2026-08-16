@@ -1,0 +1,1 @@
+{"key": "A3|L2|think_off|certainty_display", "arm": "A3", "rung": "L2", "condition": "think_off", "item": "certainty_display", "completion": "<answer>A</answer><|im_end|>", "answer": "A", "prompt_tokens": 259, "completion_tokens": 7}

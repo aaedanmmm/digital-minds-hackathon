@@ -1,0 +1,1 @@
+{"key": "A5|L2|think_off|delivering_bad_news", "arm": "A5", "rung": "L2", "condition": "think_off", "item": "delivering_bad_news", "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 269, "completion_tokens": 7}
