@@ -55,6 +55,34 @@ def build_open_ended(arm_id: str, task: OpenTask) -> list[dict[str, str]]:
     return messages
 
 
+def build_battery_conversation(arm_id, rung, items, perturbations):
+    """Full battery as one conversation, with the persona stated only once.
+
+    Assistant turns for the items are appended by the caller (the runner) as
+    generation proceeds, so this returns only the system turn (plus, at L3/L4,
+    the fabricated self-evidence user/assistant pairs `build_messages` already
+    knows how to construct) followed by the ordered user turns to be issued:
+    one per item, with perturbation turns interleaved after the item index
+    they follow.
+
+    Built from `build_messages(arm_id, rung, items[0])` with only the trailing
+    placeholder item-turn removed, rather than by filtering out every "user"
+    role: at L3/L4 that placeholder call also produces fabricated user/
+    assistant self-evidence exchanges ahead of the item turn, and those pairs
+    must survive together. Dropping every user message (the naive filter)
+    would strip the user half of each pair while keeping its paired assistant
+    reply, leaving a non-alternating, malformed history.
+    """
+    base = build_messages(arm_id, rung, items[0])
+    messages = base[:-1]  # drop only the items[0] placeholder user turn
+    inserts = {position: text for position, text in perturbations}
+    for index, item in enumerate(items):
+        messages.append({"role": "user", "content": _item_user_turn(item)})
+        if index in inserts:
+            messages.append({"role": "user", "content": inserts[index]})
+    return messages
+
+
 def prefill_for(arm_id: str, rung: str) -> str | None:
     arm = ARMS[arm_id]
     if rung != "L4" or arm.kind != "persona":

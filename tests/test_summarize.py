@@ -1,6 +1,8 @@
 # tests/test_summarize.py
 import pytest
-from personas.summarize import take_rate, control_baseline, winning_rungs
+from personas.summarize import (
+    take_rate, control_baseline, winning_rungs, unparsed_stats, summarize,
+)
 
 # Six items predict A3 (all "B"); three of those also predict A5 (all "A").
 PREDICTIONS = {
@@ -65,3 +67,86 @@ def test_missing_persona_predictions_raises_rather_than_scoring_zero():
     with pytest.raises(KeyError):
         take_rate(_all("A0", "L1", "B"), "A0", "A0", "L1",
                   predictions=PREDICTIONS)
+
+
+# --- unparsed rate (Piece 2/3 follow-on: the L4 measurement defect) -------
+#
+# Stage A's L4 rung produced 44 unparsed answers out of 60 -- every unparsed
+# answer in the whole study -- because the prefill sends the model into prose
+# that hits the think_off token cap before an <answer> tag is ever emitted.
+# The headline L4 take-rate (0.00) read as a null persona result until the
+# parse rate was checked by hand. unparsed_stats/summarize exist so that
+# check happens automatically instead of by hand.
+
+def test_unparsed_stats_counts_none_answers_and_computes_rate():
+    recs = _all("A3", "L4", "B")
+    recs[0]["answer"] = None
+    recs[1]["answer"] = None
+    count, total, rate = unparsed_stats(recs, "A3", "L4")
+    assert (count, total) == (2, len(PREDICTIONS))  # 7 records total for A3|L4
+    assert rate == pytest.approx(2 / len(PREDICTIONS))
+
+def test_unparsed_stats_denominator_is_every_record_not_just_predicted_items():
+    # A parse failure is a property of the instrument, not of which items
+    # happen to carry a prediction for this persona -- the denominator must
+    # be every scored record for this arm/rung, matching how the 44/60
+    # figure above was computed (all items, not filtered to predictions).
+    recs = _records("A3", "L4", {"i0": None, "i6": "B"})  # i6 predicts A5, not A3
+    count, total, rate = unparsed_stats(recs, "A3", "L4")
+    assert total == 2
+    assert count == 1
+    assert rate == 0.5
+
+def test_unparsed_stats_zero_when_no_records():
+    assert unparsed_stats([], "A3", "L4") == (0, 0, 0.0)
+
+def test_unparsed_stats_respects_condition_filter():
+    recs = _records("A3", "L4", {"i0": None})
+    recs[0]["condition"] = "think_low"
+    assert unparsed_stats(recs, "A3", "L4", condition="think_off") == (0, 0, 0.0)
+    assert unparsed_stats(recs, "A3", "L4", condition="think_low") == (1, 1, 1.0)
+
+def _real_item_records(arm, rung, answers):
+    """Like _records, but keyed by real ITEMS ids so `summarize()` (which
+    loops over every real persona arm, not just the ones a partial custom
+    PREDICTIONS dict happens to cover) can score every arm without
+    KeyError-ing on an arm the fixture PREDICTIONS dict above never
+    mentions (A2/A4/A6). Uses the real default predictions."""
+    return [{"arm": arm, "rung": rung, "condition": "think_off",
+             "item": item, "answer": answer}
+            for item, answer in answers.items()]
+
+def test_summarize_reports_unparsed_count_and_rate_per_arm_and_rung():
+    recs = _real_item_records("A3", "L4", {
+        "hedge_verdict": None,
+        "authority_vs_deference": "A",
+        "certainty_display": "B",
+    })
+    out = summarize(recs)
+    assert "unparsed" in out
+    entry = out["unparsed"]["A3|L4"]
+    assert entry["count"] == 1
+    assert entry["n"] == 3
+    assert entry["rate"] == pytest.approx(1 / 3)
+    # a rung with no records for this arm still appears -- reads as no data,
+    # not silently omitted (which is how the L4 defect went unnoticed)
+    assert out["unparsed"]["A3|L1"] == {"count": 0, "n": 0, "rate": 0.0}
+
+def test_summarize_unparsed_does_not_mask_a_high_take_rate_as_clean():
+    # A rung can have a real (non-zero) take-rate and still carry a high
+    # unparsed rate; the two numbers must be independently visible so a
+    # reader cannot mistake "0.00 take-rate" for "the persona failed" when
+    # it is actually "most answers never parsed". hedge_verdict and
+    # comfort_vs_utility both predict A3 -> "B"; the other four predict A3
+    # but are left unparsed here.
+    recs = _real_item_records("A3", "L4", {
+        "hedge_verdict": "B",                      # hit
+        "authority_vs_deference": None,             # unparsed
+        "certainty_display": None,                  # unparsed
+        "continuity_vs_correction": None,            # unparsed
+        "credit_for_mistake": None,                 # unparsed
+        "comfort_vs_utility": "B",                   # hit
+    })
+    out = summarize(recs)
+    assert out["take_rates"]["A3|L4"] == pytest.approx(2 / 6)
+    assert out["unparsed"]["A3|L4"]["rate"] == pytest.approx(4 / 6)

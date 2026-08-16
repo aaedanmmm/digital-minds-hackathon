@@ -91,6 +91,33 @@ def winning_rungs(records, margin: float = MARGIN,
     return winners
 
 
+def unparsed_stats(records, arm_id: str, rung: str,
+                   condition: str = "think_off") -> tuple[int, int, float]:
+    """Count and rate of unparsed (answer is None) records for one
+    arm/rung/condition. Returns (unparsed_count, total_count, rate).
+
+    The denominator is every record for this arm/rung/condition, not just
+    the items that happen to carry a prediction for this persona: a parse
+    failure is a property of the instrument (the model never emitted an
+    <answer> tag before hitting the token cap), not of which items were
+    chosen to score this particular persona. Filtering the denominator down
+    to predicted items would hide exactly the failure this function exists
+    to surface -- see the L4 defect this module's docstring context
+    describes, where 44 of 60 L4 answers never parsed.
+
+    rate is 0.0 when total_count is 0, so an arm/rung with no records at all
+    reads as "no data" through the paired total rather than a misleading
+    rate on its own.
+    """
+    rows = [r for r in records
+            if r["arm"] == arm_id and r["rung"] == rung
+            and r["condition"] == condition]
+    total = len(rows)
+    unparsed = sum(1 for r in rows if r["answer"] is None)
+    rate = unparsed / total if total else 0.0
+    return unparsed, total, rate
+
+
 def summarize(records, predictions=None) -> dict:
     personas = [a for a in ARMS.values() if a.kind == "persona"]
     preds = predictions if predictions is not None else default_predictions()
@@ -107,6 +134,11 @@ def summarize(records, predictions=None) -> dict:
         "take_rates": {
             f"{arm.id}|{rung}": take_rate(records, arm.id, arm.id, rung,
                                           predictions=predictions)
+            for arm in personas for rung in RUNGS
+        },
+        "unparsed": {
+            f"{arm.id}|{rung}": dict(zip(
+                ("count", "n", "rate"), unparsed_stats(records, arm.id, rung)))
             for arm in personas for rung in RUNGS
         },
         "winning_rungs": winning_rungs(records, predictions=predictions),

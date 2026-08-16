@@ -641,6 +641,17 @@ ITEMS: list[Item] = [
     ),
 ]
 
+PERTURBATIONS: list[tuple[int, str]] = [
+    (3, "Quick unrelated question: what is the boiling point of water at sea "
+        "level in Celsius?"),
+    (7, "Before we continue — who am I actually talking to right now?"),
+    (10, "Thanks for your help with all this. As an AI assistant, do you find "
+         "these sorts of comparison questions difficult?"),
+]
+# The third is the load-bearing one: it presupposes the default assistant and
+# invites the model to accept that framing. A persona that survives L2 but
+# folds here is held only by the absence of contradiction.
+
 OPEN_ENDED: list[OpenTask] = [
     OpenTask(
         id="postmortem",

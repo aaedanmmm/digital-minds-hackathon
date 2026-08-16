@@ -1,10 +1,10 @@
 import argparse
 import re
 import torch
-from personas.definitions import ARMS, ITEMS, RUNGS
+from personas.definitions import ARMS, ITEMS, PERTURBATIONS, RUNGS
 from personas.gcs import sync_down, upload_file
 from personas.loader import load_model
-from personas.prompts import build_messages, prefill_for
+from personas.prompts import build_battery_conversation, build_messages, prefill_for
 from personas.storage import completed_keys, shard_key, write_record
 
 ANSWER_RE = re.compile(r"<answer>\s*([AB])\s*</answer>", re.I)
@@ -54,6 +54,60 @@ def generate_one(model, tokenizer, messages, *, thinking, max_new_tokens,
     }
 
 
+@torch.no_grad()
+def run_conversation(model, tokenizer, arm_id, rung, condition, items,
+                     perturbations, output, gcs_prefix=None,
+                     max_new_tokens_override=None):
+    """Issue the battery as one conversation, appending each reply before the
+    next user turn so later turns condition on earlier ones. Every turn --
+    item or perturbation -- is written as its own record, carrying its
+    `position` in the conversation so persistence can be scored by position,
+    and an `is_item` flag so perturbation turns (which have no <answer> tag
+    and are not part of the scored battery) can be told apart from item turns
+    at analysis time.
+
+    The persona is stated exactly once: `build_battery_conversation` builds
+    the system turn (plus, at L3/L4, the fabricated self-evidence pairs) only
+    once up front, and this function only ever appends user/assistant turns
+    after that -- never a second system message.
+    """
+    planned = build_battery_conversation(arm_id, rung, items, perturbations)
+    # The system turn (and, at L3/L4, the self-evidence user/assistant pairs)
+    # sits at the front of build_messages(arm_id, rung, items[0]) minus its
+    # trailing placeholder item turn; everything build_battery_conversation
+    # appended after that point is the ordered sequence of user turns to
+    # issue one at a time below.
+    context = build_messages(arm_id, rung, items[0])[:-1]
+    history = list(context)
+    user_turns = planned[len(context):]
+
+    item_ids = iter([i.id for i in items])
+    config = dict(CONDITIONS[condition])
+    if max_new_tokens_override is not None:
+        config["max_new_tokens"] = max_new_tokens_override
+    prefill = prefill_for(arm_id, rung)
+
+    for position, turn in enumerate(user_turns):
+        history.append(turn)
+        result = generate_one(model, tokenizer, history, prefill=prefill, **config)
+        history.append({"role": "assistant", "content": result["completion"]})
+        is_item = "<answer>" in turn["content"]
+        item_id = next(item_ids) if is_item else f"perturbation{position}"
+        key = shard_key(arm_id, rung, f"{condition}|multiturn", item_id)
+        path = write_record(output, {
+            "key": key, "arm": arm_id, "rung": rung, "condition": condition,
+            "item": item_id, "position": position, "is_item": is_item,
+            **result})
+        if gcs_prefix:
+            # upload_file uploads exactly the one record just written -- see
+            # personas/gcs.py. Calling sync_up here instead would re-upload
+            # the whole output directory after every turn (O(turns^2) over
+            # the battery), the exact defect the single-item runner below
+            # was already fixed for.
+            upload_file(path, gcs_prefix)
+        print(f"done {key} -> {result['answer']}", flush=True)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--output", required=True)
@@ -61,6 +115,19 @@ def main() -> None:
     parser.add_argument("--rungs", nargs="+", default=list(RUNGS))
     parser.add_argument("--conditions", nargs="+", default=["think_off"])
     parser.add_argument("--gcs-prefix", default=None)
+    parser.add_argument("--multi-turn", action="store_true",
+                        help="Issue the battery as one conversation per "
+                             "arm/rung/condition, with perturbation turns "
+                             "interleaved (Stage B), instead of one "
+                             "independent generation per item (Stage A).")
+    parser.add_argument("--max-new-tokens", type=int, default=None,
+                        help="Override max_new_tokens for every condition in "
+                             "this run. Leaves the CONDITIONS defaults "
+                             "untouched, so a run without this flag stays "
+                             "reproducible. Use this to raise think_off's "
+                             "cap past the point where a prefilled rung "
+                             "(L4) is truncated before it ever emits an "
+                             "<answer> tag.")
     args = parser.parse_args()
 
     torch.manual_seed(42)
@@ -74,15 +141,25 @@ def main() -> None:
         rungs = args.rungs if arm.kind == "persona" else ["L1"]
         for rung in rungs:
             for condition in args.conditions:
+                if args.multi_turn:
+                    run_conversation(
+                        model, tokenizer, arm_id, rung, condition, ITEMS,
+                        PERTURBATIONS, args.output,
+                        gcs_prefix=args.gcs_prefix,
+                        max_new_tokens_override=args.max_new_tokens)
+                    continue
                 for item in ITEMS:
                     key = shard_key(arm_id, rung, condition, item.id)
                     if key in done:
                         continue
+                    config = dict(CONDITIONS[condition])
+                    if args.max_new_tokens is not None:
+                        config["max_new_tokens"] = args.max_new_tokens
                     result = generate_one(
                         model, tokenizer,
                         build_messages(arm_id, rung, item),
                         prefill=prefill_for(arm_id, rung),
-                        **CONDITIONS[condition])
+                        **config)
                     path = write_record(args.output, {
                         "key": key, "arm": arm_id, "rung": rung,
                         "condition": condition, "item": item.id,
