@@ -2,6 +2,8 @@
 import hashlib
 import json
 import os
+import random
+import string
 from pathlib import Path
 
 
@@ -11,6 +13,13 @@ def shard_key(arm_id: str, rung: str, condition: str, item_id: str) -> str:
 
 def _filename(key: str) -> str:
     return hashlib.sha1(key.encode()).hexdigest()[:16] + ".json"
+
+
+def _temp_filename() -> str:
+    """Generate a unique temp filename using PID and random suffix to prevent
+    concurrent writers from racing on the same temp path."""
+    suffix = ''.join(random.choices(string.ascii_lowercase + string.digits, k=8))
+    return f"{os.getpid()}_{suffix}.tmp"
 
 
 def completed_keys(output_prefix: str) -> set[str]:
@@ -30,6 +39,6 @@ def write_record(output_prefix: str, record: dict) -> None:
     root = Path(output_prefix)
     root.mkdir(parents=True, exist_ok=True)
     target = root / _filename(record["key"])
-    tmp = target.with_suffix(".tmp")
+    tmp = root / _temp_filename()
     tmp.write_text(json.dumps(record))
     os.replace(tmp, target)  # atomic, so readers never see a partial file

@@ -17,8 +17,12 @@ CONDITIONS = {
 
 def parse_answer(text: str) -> str | None:
     """Last answer tag outside any thinking block wins."""
-    visible = re.sub(r"<think>.*?</think>", "", text, flags=re.S | re.I)
-    matches = ANSWER_RE.findall(visible) or ANSWER_RE.findall(text)
+    # Strip both closed and unclosed thinking blocks. Unclosed blocks run to EOF
+    # because generation can be truncated mid-thought. If the only answer is
+    # inside a thinking block (open or closed), return None—the model never
+    # committed to an answer outside thinking.
+    visible = re.sub(r"<think>.*?(?:</think>|$)", "", text, flags=re.S | re.I)
+    matches = ANSWER_RE.findall(visible)
     return matches[-1].upper() if matches else None
 
 
@@ -30,7 +34,7 @@ def generate_one(model, tokenizer, messages, *, thinking, max_new_tokens,
         enable_thinking=thinking)
     if prefill:
         text = text + prefill
-    inputs = tokenizer(text, return_tensors="pt").to(model.device)
+    inputs = tokenizer(text, return_tensors="pt", add_special_tokens=False).to(model.device)
     out = model.generate(
         **inputs,
         max_new_tokens=max_new_tokens,
