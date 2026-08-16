@@ -1,4 +1,4 @@
-# Q1 Prompt Templates
+# Preference-Trace Prompt Templates
 
 This file collects the two prompt templates used by the preference-trace
 pipeline. Replace the placeholder values before sending a prompt to a model.
