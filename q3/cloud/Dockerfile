@@ -25,7 +25,7 @@ RUN python -m pip install --no-cache-dir --upgrade \
     "safetensors" \
     "sentencepiece"
 
-COPY personas ./personas
+COPY q3/personas ./personas
 
 ENTRYPOINT ["python", "-m"]
 CMD ["personas.probe"]

@@ -1,4 +1,4 @@
-"""Render a Vertex custom-job YAML from cloud/battery-job.yaml.template.
+"""Render a Vertex custom-job YAML from q3/cloud/battery-job.yaml.template.
 
 Defect this exists to fix: the original approach built the container's
 `args` list with `sed`, substituting a placeholder like `__ARMS__` with a
@@ -82,7 +82,7 @@ def normalize_timeout(value: int | str) -> str:
 
     Fix round 2, Finding 3 bug: `scheduling.timeout` is a protobuf Duration,
     whose valid encoding is a seconds-count string suffixed with 's' (as in
-    the known-good cloud/probe-job.yaml: `timeout: 3600s`). Passing a bare
+    the known-good q3/cloud/probe-job.yaml: `timeout: 3600s`). Passing a bare
     numeral like "7200" straight through into the YAML doc round-trips
     through PyYAML as the *string* '7200' -- PyYAML must quote it, since an
     unquoted 7200 would parse back as an int -- which is not a valid

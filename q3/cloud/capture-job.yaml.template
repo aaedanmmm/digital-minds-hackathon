@@ -2,14 +2,14 @@
 # (personas.capture_main / Task 8).
 #
 # `imageUri` and `args` are placeholders here, exactly as in
-# cloud/battery-job.yaml.template: fill them in as a real YAML list (one
+# q3/cloud/battery-job.yaml.template: fill them in as a real YAML list (one
 # element per flag/value), never by gluing a multi-word string like
 # "--arms A0 A3" onto one line with sed. That produces ONE YAML list
 # element containing spaces; Vertex hands each `args` element to the
 # container as a single argv token, so personas.capture_main's `argparse`
 # (`--arms`/`--rungs`, both `nargs="+"`) would see one glued string instead
 # of separate tokens and fail well into a paid A100 run. See
-# cloud/render_job.py's module docstring for the original defect this
+# q3/cloud/render_job.py's module docstring for the original defect this
 # describes (there for personas.runner) -- render_job.py itself is scoped
 # to personas.runner today and does not render this template; either
 # extend it or fill this file in by hand, but always as a proper list.
@@ -17,7 +17,7 @@
 # personas.capture_main's CLI:
 #   --output OUTPUT_DIR          (required; local scratch dir, e.g. /tmp/activations)
 #   --gcs-prefix GCS_PREFIX      (optional; gs://... -- enables resume-from-GCS
-#                                 and per-capture upload; see personas/gcs.py)
+#                                 and per-capture upload; see q3/personas/gcs.py)
 #   --arms ARM_ID [ARM_ID ...]   (required; paired positionally with --rungs --
 #                                 the Nth rung goes with the Nth arm, e.g.
 #                                 --arms A0 A3 --rungs L1 L2 captures (A0, L1)
@@ -29,7 +29,7 @@
 # attention (48 linear-attention + 16 full-attention layers, full attention
 # at indices 3, 7, 11, ... 63) would sample linear-attention layers
 # exclusively and silently miss every full-attention layer. See
-# personas/activations.py's module docstring. At 640KB/position/prompt this
+# q3/personas/activations.py's module docstring. At 640KB/position/prompt this
 # job's disk and upload footprint stays trivial even at the full battery
 # size, so this is a deliberate non-optimization.
 workerPoolSpecs:

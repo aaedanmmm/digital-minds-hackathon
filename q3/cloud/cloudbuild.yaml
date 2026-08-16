@@ -2,17 +2,17 @@
 #
 # The brief's `gcloud builds submit --tag=... .` is wrong: --tag makes Cloud
 # Build look for a file literally named `Dockerfile` at the root of the build
-# context, but ours lives at cloud/Dockerfile (deliberately, alongside the
-# other cloud/ job configs). Building with an explicit -f flag against the
-# repo-root context (so `COPY personas ./personas` in the Dockerfile resolves)
-# and submitting with --config instead of --tag fixes this without moving the
-# Dockerfile.
+# context, but ours lives at q3/cloud/Dockerfile (deliberately, alongside the
+# other q3/cloud/ job configs). Building with an explicit -f flag against the
+# repo-root context (so `COPY q3/personas ./personas` in the Dockerfile
+# resolves) and submitting with --config instead of --tag fixes this without
+# moving the Dockerfile.
 steps:
   - name: "gcr.io/cloud-builders/docker"
     args:
       - build
       - -f
-      - cloud/Dockerfile
+      - q3/cloud/Dockerfile
       - -t
       - "${_IMAGE_URI}"
       - .

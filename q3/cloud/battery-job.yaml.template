@@ -1,11 +1,11 @@
 # Vertex custom-job config for a persona-battery worker.
 #
 # `imageUri`, `args`, and `scheduling.timeout` are placeholders here:
-# cloud/render_job.py loads this file as YAML (not text), overwrites those
+# q3/cloud/render_job.py loads this file as YAML (not text), overwrites those
 # fields with real Python values, and re-serializes it. In particular
 # `args` is filled in as a genuine YAML list -- one element per flag/value
 # -- never as a single string glued together with spaces. See
-# cloud/render_job.py's module docstring for the defect that pattern used
+# q3/cloud/render_job.py's module docstring for the defect that pattern used
 # to cause. The `timeout` value below is never actually submitted as-is --
 # render_job.py always overwrites it with its `--timeout` argument (default
 # 7200s) -- it's set here only so the template is valid, runnable YAML on

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Submit a persona-battery Vertex custom job (Stage A or Stage B).
 #
-# Rendering is delegated to cloud/render_job.py rather than sed: sed can only
+# Rendering is delegated to q3/cloud/render_job.py rather than sed: sed can only
 # place a whole substituted string onto one YAML line, which turns a
 # multi-word arg list like "A0 A1 A2 A3 A4 A5 A6" into a single glued list
 # element instead of seven separate ones (see render_job.py's docstring).

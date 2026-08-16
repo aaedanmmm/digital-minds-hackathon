@@ -151,7 +151,7 @@ def test_render_to_file_writes_an_unquoted_duration_suffixed_timeout_line(tmp_pa
     with a bare-integer --timeout equivalent and inspect the raw file text
     (not the parsed-back value), since a quoted '7200s' would parse back
     identically to an unquoted 7200s but is not the shape the known-good
-    cloud/probe-job.yaml uses."""
+    q3/cloud/probe-job.yaml uses."""
     out = tmp_path / "job.yaml"
     render_to_file(
         str(out),
