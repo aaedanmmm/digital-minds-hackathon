@@ -2,6 +2,7 @@ import argparse
 import re
 import torch
 from personas.definitions import ARMS, ITEMS, RUNGS
+from personas.gcs import sync_down, upload_file
 from personas.loader import load_model
 from personas.prompts import build_messages, prefill_for
 from personas.storage import completed_keys, shard_key, write_record
@@ -59,9 +60,12 @@ def main() -> None:
     parser.add_argument("--arms", nargs="+", required=True)
     parser.add_argument("--rungs", nargs="+", default=list(RUNGS))
     parser.add_argument("--conditions", nargs="+", default=["think_off"])
+    parser.add_argument("--gcs-prefix", default=None)
     args = parser.parse_args()
 
     torch.manual_seed(42)
+    if args.gcs_prefix:
+        sync_down(args.gcs_prefix, args.output)
     done = completed_keys(args.output)
     model, tokenizer = load_model()
 
@@ -79,10 +83,15 @@ def main() -> None:
                         build_messages(arm_id, rung, item),
                         prefill=prefill_for(arm_id, rung),
                         **CONDITIONS[condition])
-                    write_record(args.output, {
+                    path = write_record(args.output, {
                         "key": key, "arm": arm_id, "rung": rung,
                         "condition": condition, "item": item.id,
                         **result})
+                    if args.gcs_prefix:
+                        # Upload only the record just written (O(1)), not a
+                        # full resync of the output directory (O(records)) --
+                        # see personas/gcs.py for why that distinction matters.
+                        upload_file(path, args.gcs_prefix)
                     print(f"done {key} -> {result['answer']}", flush=True)
 
 

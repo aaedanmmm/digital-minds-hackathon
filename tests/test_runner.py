@@ -1,3 +1,7 @@
+import sys
+
+import personas.runner as runner
+from personas.definitions import ITEMS
 from personas.runner import parse_answer, generate_one
 
 
@@ -153,3 +157,79 @@ def test_generate_one_does_not_double_add_special_tokens():
     # Verify add_special_tokens=False was passed
     call_kwargs = tokenizer.call_args[1]
     assert call_kwargs["add_special_tokens"] is False
+
+
+def _stub_generation(monkeypatch):
+    """Stand in for load_model/generate_one so main() runs with no real
+    model, torch device, or GPU. Real ARMS/ITEMS still drive the loop."""
+    monkeypatch.setattr(runner, "load_model", lambda: (object(), object()))
+    monkeypatch.setattr(
+        runner, "generate_one",
+        lambda *a, **k: {
+            "completion": "<answer>A</answer>", "answer": "A",
+            "prompt_tokens": 1, "completion_tokens": 1,
+        },
+    )
+
+
+def test_main_skips_gcs_sync_entirely_when_no_gcs_prefix(tmp_path, monkeypatch):
+    _stub_generation(monkeypatch)
+    calls = []
+    monkeypatch.setattr(runner, "sync_down", lambda *a, **k: calls.append(("sync_down", a)))
+    monkeypatch.setattr(runner, "upload_file", lambda *a, **k: calls.append(("upload_file", a)))
+    monkeypatch.setattr(sys, "argv", [
+        "prog", "--output", str(tmp_path), "--arms", "A0",
+        "--rungs", "L1", "--conditions", "think_off",
+    ])
+
+    runner.main()
+
+    assert calls == []
+
+
+def test_main_pulls_before_the_run_and_uploads_one_file_per_record(tmp_path, monkeypatch):
+    """Defect 2 regression: the runner must upload exactly the record just
+    written after each write, never re-glob and re-upload the whole
+    directory (that pattern is O(records^2) over a battery)."""
+    _stub_generation(monkeypatch)
+    sync_down_calls = []
+    upload_calls = []
+    monkeypatch.setattr(runner, "sync_down", lambda gcs, local: sync_down_calls.append((gcs, local)))
+    monkeypatch.setattr(runner, "upload_file", lambda path, gcs: upload_calls.append((path, gcs)))
+    monkeypatch.setattr(sys, "argv", [
+        "prog", "--output", str(tmp_path), "--arms", "A0",
+        "--rungs", "L1", "--conditions", "think_off",
+        "--gcs-prefix", "gs://bucket/persona-elicitation/stage-a",
+    ])
+
+    runner.main()
+
+    # pulled existing state exactly once, before any record was written
+    assert sync_down_calls == [("gs://bucket/persona-elicitation/stage-a", str(tmp_path))]
+
+    # one upload call per record actually written -- A0 is a control arm,
+    # pinned to L1 regardless of --rungs, so exactly len(ITEMS) records
+    assert len(upload_calls) == len(ITEMS)
+
+    # each call names a distinct file (the record just written), never the
+    # whole directory -- that distinguishes the O(1)-per-call fix from the
+    # quadratic "resync everything after every write" defect
+    uploaded_paths = [path for path, _ in upload_calls]
+    assert len(set(uploaded_paths)) == len(ITEMS)
+    for path, gcs_prefix in upload_calls:
+        assert gcs_prefix == "gs://bucket/persona-elicitation/stage-a"
+        assert str(path).endswith(".json")
+
+
+def test_main_registers_gcs_prefix_flag_as_optional(tmp_path, monkeypatch):
+    """No --gcs-prefix should still run fine (local-only mode)."""
+    _stub_generation(monkeypatch)
+    monkeypatch.setattr(sys, "argv", [
+        "prog", "--output", str(tmp_path), "--arms", "A0",
+        "--rungs", "L1", "--conditions", "think_off",
+    ])
+
+    runner.main()  # must not raise
+
+    from personas.storage import completed_keys
+    assert len(completed_keys(str(tmp_path))) == len(ITEMS)

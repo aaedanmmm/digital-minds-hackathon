@@ -35,10 +35,17 @@ def completed_keys(output_prefix: str) -> set[str]:
     return keys
 
 
-def write_record(output_prefix: str, record: dict) -> None:
+def write_record(output_prefix: str, record: dict) -> Path:
+    """Write one record and return the path it was written to.
+
+    The return value lets a caller (e.g. the runner's GCS sync) upload
+    exactly the file just written, instead of re-scanning the whole output
+    directory after every record.
+    """
     root = Path(output_prefix)
     root.mkdir(parents=True, exist_ok=True)
     target = root / _filename(record["key"])
     tmp = root / _temp_filename()
     tmp.write_text(json.dumps(record))
     os.replace(tmp, target)  # atomic, so readers never see a partial file
+    return target

@@ -1,0 +1,25 @@
+# Vertex custom-job config for a persona-battery worker.
+#
+# `imageUri` and `args` are placeholders here: cloud/render_job.py loads
+# this file as YAML (not text), overwrites those two fields with real
+# Python values, and re-serializes it. In particular `args` is filled in as
+# a genuine YAML list -- one element per flag/value -- never as a single
+# string glued together with spaces. See cloud/render_job.py's module
+# docstring for the defect that pattern used to cause.
+workerPoolSpecs:
+  - machineSpec:
+      machineType: a2-highgpu-2g
+      acceleratorType: NVIDIA_TESLA_A100
+      acceleratorCount: 2
+    replicaCount: 1
+    diskSpec:
+      bootDiskType: pd-ssd
+      bootDiskSizeGb: 400
+    containerSpec:
+      imageUri: __IMAGE_URI__
+      command: [python, -m]
+      args: []
+scheduling:
+  strategy: SPOT
+  timeout: 86400s
+  restartJobOnWorkerRestart: true
