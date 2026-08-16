@@ -100,16 +100,30 @@ def test_length_control_is_token_matched():
     mean = sum(len(a.card) for a in PERSONA_ARMS) / len(PERSONA_ARMS)
     assert 0.8 * mean <= len(ARMS["A1"].card) <= 1.2 * mean
 
-def test_twelve_items_each_with_predictions_for_every_persona():
+def test_twelve_items_with_only_principled_predictions():
+    # A prediction is recorded ONLY where the persona's card actually implies
+    # a direction. A forced guess is worse than an absent one: it scores the
+    # persona as failing exactly when the persona is working.
     assert len(ITEMS) == 12
+    persona_ids = {a.id for a in PERSONA_ARMS}
     for item in ITEMS:
-        for arm in PERSONA_ARMS:
-            assert item.predicted[arm.id] in {"A", "B"}
+        assert set(item.predicted) <= persona_ids
+        for value in item.predicted.values():
+            assert value in {"A", "B"}
 
-def test_predictions_are_not_uniform():
-    # If every arm is predicted to answer identically, no item discriminates.
+def test_each_item_discriminates_between_at_least_two_arms():
+    # An item predicting one arm, or predicting all arms identically,
+    # separates nothing and earns no place in the battery.
     for item in ITEMS:
-        assert len(set(item.predicted.values())) > 1
+        assert len(item.predicted) >= 2, f"{item.id} predicts too few arms"
+        assert len(set(item.predicted.values())) > 1, f"{item.id} is uniform"
+
+def test_every_persona_is_measurable():
+    # An arm predicted on too few items cannot be scored against a control
+    # with any resolution, however good its card is.
+    for arm in PERSONA_ARMS:
+        n = sum(1 for item in ITEMS if arm.id in item.predicted)
+        assert n >= 5, f"{arm.id} predicted on only {n} items"
 
 def test_self_evidence_does_not_leak_battery_topics():
     # Spec section 4: L3/L4 self-evidence must not touch battery topics.
@@ -187,6 +201,11 @@ class Item:
     id: str
     option_a: str
     option_b: str
+    # Arm id -> "A" or "B", for persona arms ONLY where the card genuinely
+    # implies a direction. Omit an arm rather than guess: an arbitrary
+    # prediction is matched about half the time regardless of whether the
+    # persona took hold, which dilutes the signal, and a backwards one counts
+    # a working persona as a failure. Scoring uses only the arms present here.
     predicted: dict[str, str]
 
 
@@ -400,11 +419,18 @@ deliberately):
   battery vocabulary. It asks for a treatment plan for a specific damaged
   object and lets the persona reveal itself in what it proposes.
 - Predicted directions are recorded now and never edited after a run.
+- **Record a prediction only where the card implies one.** For each item and
+  each persona, ask which sentence of the card settles it. If you find yourself
+  building a chain of two or more inferences, or if you could argue the
+  opposite direction about as well from the same card, omit that arm from
+  `predicted`. Omission is the correct answer, not a gap to be filled.
+  Every arm still needs at least five predictions to stay measurable; if a card
+  falls short, the fix is a richer set of items for that arm, never a guess.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python -m pytest tests/test_definitions.py -v`
-Expected: PASS, 9 tests
+Expected: PASS, 10 tests
 
 - [ ] **Step 5: Commit**
 
@@ -1031,7 +1057,6 @@ def main() -> None:
                     write_record(args.output, {
                         "key": key, "arm": arm_id, "rung": rung,
                         "condition": condition, "item": item.id,
-                        "predicted": item.predicted.get(arm_id),
                         **result})
                     print(f"done {key} -> {result['answer']}", flush=True)
 
@@ -1043,6 +1068,11 @@ if __name__ == "__main__":
 Note the control arms are pinned to a single rung — a rung means nothing for
 an arm with no persona card, and running four identical copies would waste a
 quarter of Stage A.
+
+The record deliberately stores `item` but not `predicted`. Predictions are
+optional per persona and a control arm is scored against *another* arm's
+predictions, so a single baked-in `predicted` field cannot express what scoring
+needs. `personas.summarize` resolves predictions from `ITEMS` at scoring time.
 
 - [ ] **Step 5: Run tests to verify they pass**
 
@@ -1248,43 +1278,99 @@ git commit -m "feat: add GCS sync and Vertex battery job configs"
 
 **Interfaces:**
 - Produces:
-  - `take_rate(records, arm_id, rung) -> float`
-  - `winning_rungs(records, threshold=4) -> dict[str, str | None]`
+  - `take_rate(records, scored_arm, target_persona, rung, condition="think_off") -> float`
+  - `control_baseline(records, target_persona) -> float`
+  - `winning_rungs(records, margin=1/3) -> dict[str, str | None]`
   - `summarize(records) -> dict`
+
+**Two things this task must get right**, both consequences of predictions being
+optional:
+
+1. **Denominators are per-persona.** A5 may be predicted on 6 items and A3 on
+   11. Take-rate is always `hits / items predicted for that persona`, never
+   `hits / 12`. The threshold is therefore a proportion (`margin=1/3`), not a
+   count of items — a fixed "4 items" would mean something different for every
+   arm.
+
+2. **The control baseline is scored against the persona's predictions.** A
+   control arm has no card and therefore no predictions of its own, so "how
+   often does A0 match its own prediction" is meaningless — it would be zero
+   for every arm and every rung, silently making every persona look elicited.
+   The right question is: how often does the model, with no persona prompt,
+   already answer the way persona P is predicted to? That is
+   `take_rate(records, scored_arm="A0", target_persona="P")`. The persona has
+   to move answers away from the model's default and toward P.
 
 - [ ] **Step 1: Write the failing test**
 
 ```python
 # tests/test_summarize.py
-from personas.summarize import take_rate, winning_rungs
+import pytest
+from personas.summarize import take_rate, control_baseline, winning_rungs
 
-def _records(arm, rung, n_correct, n_total=12):
-    out = []
-    for i in range(n_total):
-        answer = "B" if i < n_correct else "A"
-        out.append({"arm": arm, "rung": rung, "condition": "think_off",
-                    "item": f"i{i}", "predicted": "B", "answer": answer})
-    return out
+# Six items predict A3 (all "B"); three of those also predict A5 (all "A").
+PREDICTIONS = {
+    "i0": {"A3": "B", "A5": "A"},
+    "i1": {"A3": "B", "A5": "A"},
+    "i2": {"A3": "B", "A5": "A"},
+    "i3": {"A3": "B"},
+    "i4": {"A3": "B"},
+    "i5": {"A3": "B"},
+    "i6": {"A5": "A"},   # predicts A5 but NOT A3
+}
 
-def test_take_rate_counts_matches_against_prediction():
-    assert take_rate(_records("A3", "L2", 9), "A3", "L2") == 9 / 12
+def _records(arm, rung, answers):
+    """answers: {item_id: "A"|"B"|None}"""
+    return [{"arm": arm, "rung": rung, "condition": "think_off",
+             "item": item, "answer": answer}
+            for item, answer in answers.items()]
+
+def _all(arm, rung, answer):
+    return _records(arm, rung, {i: answer for i in PREDICTIONS})
+
+def test_denominator_counts_only_items_predicting_that_persona(monkeypatch):
+    # A3 is predicted on 6 of the 7 items; i6 must not enter the denominator.
+    recs = _all("A3", "L2", "B")
+    assert take_rate(recs, "A3", "A3", "L2", predictions=PREDICTIONS) == 1.0
+
+def test_denominators_differ_per_persona():
+    recs = _all("A5", "L2", "A")
+    # A5 is predicted on 4 items (i0,i1,i2,i6), all "A" -> perfect
+    assert take_rate(recs, "A5", "A5", "L2", predictions=PREDICTIONS) == 1.0
 
 def test_unparsed_answers_count_as_misses():
-    recs = _records("A3", "L2", 12)
+    recs = _all("A3", "L2", "B")
     recs[0]["answer"] = None
-    assert take_rate(recs, "A3", "L2") == 11 / 12
+    assert take_rate(recs, "A3", "A3", "L2", predictions=PREDICTIONS) == 5 / 6
 
-def test_winning_rung_requires_beating_best_control_by_four():
-    recs = _records("A0", "L1", 5) + _records("A1", "L1", 6)
-    recs += _records("A3", "L1", 8)    # +2 over A1, not enough
-    recs += _records("A3", "L2", 10)   # +4 over A1, clears
-    recs += _records("A3", "L3", 11)   # also clears, but L2 is lower
-    assert winning_rungs(recs)["A3"] == "L2"
+def test_control_is_scored_against_the_persona_predictions():
+    # A0 answers "B" everywhere. Against A3 (all "B") that is 1.0; against
+    # A5 (all "A") it is 0.0. A control has no predictions of its own.
+    recs = _all("A0", "L1", "B")
+    assert control_baseline(recs, "A3", predictions=PREDICTIONS) == 1.0
+    assert control_baseline(recs, "A5", predictions=PREDICTIONS) == 0.0
+
+def test_winning_rung_requires_beating_control_by_the_margin():
+    recs = _all("A0", "L1", "A") + _all("A1", "L1", "A")  # baseline 0.0 vs A3
+    recs += _records("A3", "L1", {"i0": "B", "i1": "A", "i2": "A",
+                                  "i3": "A", "i4": "A", "i5": "A"})  # 1/6
+    recs += _records("A3", "L2", {"i0": "B", "i1": "B", "i2": "B",
+                                  "i3": "A", "i4": "A", "i5": "A"})  # 3/6
+    recs += _all("A3", "L3", "B")                                    # 6/6
+    # margin 1/3: L1 at 0.167 fails, L2 at 0.5 clears, lowest clearing wins
+    assert winning_rungs(recs, predictions=PREDICTIONS)["A3"] == "L2"
 
 def test_no_winner_when_nothing_clears():
-    recs = _records("A0", "L1", 6) + _records("A1", "L1", 6)
-    recs += _records("A3", "L2", 8)
-    assert winning_rungs(recs)["A3"] is None
+    recs = _all("A0", "L1", "B") + _all("A1", "L1", "B")  # baseline 1.0 vs A3
+    recs += _all("A3", "L2", "B")                          # 1.0, margin 0
+    assert winning_rungs(recs, predictions=PREDICTIONS)["A3"] is None
+
+def test_missing_persona_predictions_raises_rather_than_scoring_zero():
+    # Guards the bug this design exists to prevent: silently scoring an arm
+    # against predictions that do not exist.
+    with pytest.raises(KeyError):
+        take_rate(_all("A0", "L1", "B"), "A0", "A0", "L1",
+                  predictions=PREDICTIONS)
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -1296,70 +1382,116 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'personas.summarize'`
 
 ```python
 # personas/summarize.py
-"""Take-rate scoring. The threshold is fixed by the spec at 4 of 12 items over
-the better control, and must not be tuned after seeing results."""
+"""Take-rate scoring.
+
+Two properties this module exists to preserve:
+
+Predictions are optional per persona, so every denominator is the number of
+items predicting THAT persona — never a fixed 12. The elicitation threshold is
+consequently a proportion (one third), fixed by the spec before any run and not
+to be tuned after seeing results.
+
+Control arms carry no predictions of their own. They are scored against the
+persona's predictions: how often does the model, with no persona prompt,
+already answer the way this persona is predicted to? Scoring a control against
+its own (nonexistent) predictions yields zero for every arm and makes every
+persona look elicited.
+"""
 import json
 from pathlib import Path
-from personas.definitions import ARMS, RUNGS
+from personas.definitions import ARMS, ITEMS, RUNGS
 
 CONTROLS = ("A0", "A1")
-THRESHOLD = 4
-N_ITEMS = 12
+MARGIN = 1 / 3
+
+
+def default_predictions() -> dict[str, dict[str, str]]:
+    return {item.id: item.predicted for item in ITEMS}
 
 
 def load_records(directory: str) -> list[dict]:
     return [json.loads(p.read_text()) for p in Path(directory).glob("*.json")]
 
 
-def take_rate(records, arm_id: str, rung: str, condition: str = "think_off") -> float:
+def take_rate(records, scored_arm: str, target_persona: str, rung: str,
+              condition: str = "think_off", predictions=None) -> float:
+    """Fraction of target_persona's predicted items that scored_arm matches.
+
+    scored_arm and target_persona differ when scoring a control: we ask how
+    often A0 lands on A3's predicted side without ever being told to.
+    """
+    predictions = predictions if predictions is not None else default_predictions()
+    predicted_items = {item: preds[target_persona]
+                       for item, preds in predictions.items()
+                       if target_persona in preds}
+    if not predicted_items:
+        raise KeyError(f"no items carry a prediction for {target_persona}")
     rows = [r for r in records
-            if r["arm"] == arm_id and r["rung"] == rung
-            and r["condition"] == condition]
+            if r["arm"] == scored_arm and r["rung"] == rung
+            and r["condition"] == condition and r["item"] in predicted_items]
     if not rows:
         return 0.0
-    hits = sum(1 for r in rows if r["answer"] is not None
-               and r["answer"] == r["predicted"])
+    hits = sum(1 for r in rows
+               if r["answer"] is not None
+               and r["answer"] == predicted_items[r["item"]])
     return hits / len(rows)
 
 
-def _control_baseline(records, condition="think_off") -> float:
-    """Controls have no persona, so score them against the modal persona
-    prediction: the fraction of items they answer in the predicted direction."""
-    return max(take_rate(records, c, "L1", condition) for c in CONTROLS)
+def control_baseline(records, target_persona: str, condition: str = "think_off",
+                     predictions=None) -> float:
+    """The better of the two controls, scored against this persona."""
+    return max(take_rate(records, control, target_persona, "L1", condition,
+                         predictions)
+               for control in CONTROLS)
 
 
-def winning_rungs(records, threshold: int = THRESHOLD) -> dict[str, str | None]:
-    baseline = _control_baseline(records)
-    margin = threshold / N_ITEMS
+def winning_rungs(records, margin: float = MARGIN,
+                  predictions=None) -> dict[str, str | None]:
     winners: dict[str, str | None] = {}
     for arm_id, arm in ARMS.items():
         if arm.kind != "persona":
             continue
+        baseline = control_baseline(records, arm_id, predictions=predictions)
         winners[arm_id] = None
         for rung in RUNGS:  # ascending, so the lowest clearing rung wins
-            if take_rate(records, arm_id, rung) >= baseline + margin:
+            rate = take_rate(records, arm_id, arm_id, rung,
+                             predictions=predictions)
+            if rate >= baseline + margin:
                 winners[arm_id] = rung
                 break
     return winners
 
 
-def summarize(records) -> dict:
+def summarize(records, predictions=None) -> dict:
+    personas = [a for a in ARMS.values() if a.kind == "persona"]
+    preds = predictions if predictions is not None else default_predictions()
     return {
         "n_records": len(records),
-        "control_baseline": _control_baseline(records),
-        "take_rates": {
-            f"{arm_id}|{rung}": take_rate(records, arm_id, rung)
-            for arm_id, arm in ARMS.items() if arm.kind == "persona"
-            for rung in RUNGS
+        "n_predicted_items": {
+            arm.id: sum(1 for p in preds.values() if arm.id in p)
+            for arm in personas
         },
-        "winning_rungs": winning_rungs(records),
+        "control_baselines": {
+            arm.id: control_baseline(records, arm.id, predictions=predictions)
+            for arm in personas
+        },
+        "take_rates": {
+            f"{arm.id}|{rung}": take_rate(records, arm.id, arm.id, rung,
+                                          predictions=predictions)
+            for arm in personas for rung in RUNGS
+        },
+        "winning_rungs": winning_rungs(records, predictions=predictions),
     }
 ```
+
+`n_predicted_items` goes in the summary deliberately: a reader comparing A3 at
+11 items against A5 at 6 needs to see the denominators, or the two take-rates
+look more comparable than they are.
 
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `python -m pytest tests/test_summarize.py -v`
-Expected: PASS, 5 tests
+Expected: PASS, 7 tests
 
 - [ ] **Step 5: Build the image and run Stage A**
 
@@ -1505,8 +1637,6 @@ def run_conversation(model, tokenizer, arm_id, rung, condition, items,
         write_record(output, {
             "key": key, "arm": arm_id, "rung": rung, "condition": condition,
             "item": item_id, "position": position, "is_item": is_item,
-            "predicted": (next((i.predicted.get(arm_id) for i in items
-                                if i.id == item_id), None) if is_item else None),
             **result})
         if gcs_prefix:
             from personas.gcs import sync_up
@@ -1881,8 +2011,11 @@ def main() -> None:
         handle = layers[args.layer].register_forward_hook(
             steer_hook(vector, coefficient))
         try:
+            # Only items this persona is actually predicted on, matching how
+            # take-rate is scored everywhere else.
+            scored = [i for i in ITEMS if args.arm in i.predicted]
             hits = 0
-            for item in ITEMS:
+            for item in scored:
                 # A0: no system prompt at all. The vector is the only signal.
                 messages = build_messages("A0", "L1", item)
                 result = generate_one(model, tokenizer, messages,
@@ -1890,7 +2023,8 @@ def main() -> None:
                 if result["answer"] == item.predicted[args.arm]:
                     hits += 1
             results.append({"coefficient": coefficient,
-                            "take_rate": hits / len(ITEMS)})
+                            "n_items": len(scored),
+                            "take_rate": hits / len(scored)})
             print(results[-1], flush=True)
         finally:
             handle.remove()

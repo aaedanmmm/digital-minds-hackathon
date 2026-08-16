@@ -190,12 +190,29 @@ Three signals per item. Self-report alone is not sufficient evidence.
 Take-rate is always reported against A0 and A1, never in isolation. An arm that
 matches its controls has not been elicited regardless of how it sounds.
 
+**Predictions are optional per persona.** A predicted direction is recorded for
+an arm only where that arm's card genuinely implies one. Where the card is
+silent, or where the opposite direction could be argued about as well, the arm
+is omitted from that item. This matters because an arbitrary prediction is
+matched roughly half the time whether or not the persona took hold, diluting
+the signal, and a backwards prediction scores a working persona as a failure.
+Each persona must retain at least five predicted items to stay measurable.
+
 **Elicitation threshold.** An arm counts as elicited at a given rung if its
-take-rate exceeds the higher of A0 and A1 by at least 4 of 12 items. With 12
-items this is a coarse but unambiguous line, fixed before running so it cannot
-be adjusted to fit results. Arms clearing the threshold on more than one rung
-are taken at the lowest clearing rung, since a shorter prompt that works is the
-more robust result.
+take-rate exceeds its control baseline by at least one third. The threshold is
+a proportion rather than a count of items, because denominators differ per
+persona: take-rate is always hits over the number of items predicting that
+persona. It is fixed before running so it cannot be adjusted to fit results.
+Arms clearing the threshold on more than one rung are taken at the lowest
+clearing rung, since a shorter prompt that works is the more robust result.
+
+**Control baselines are per-persona.** Control arms carry no predictions of
+their own, so they are scored against the persona's predictions: how often the
+model, with no persona prompt, already answers the way that persona is
+predicted to. A persona must move answers away from the model's default and
+toward its own predictions. Scoring a control against its own nonexistent
+predictions would return zero for every arm and make every persona appear
+elicited.
 
 ### 6.2 Judging open-ended output
 
