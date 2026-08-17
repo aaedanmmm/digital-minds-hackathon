@@ -1,0 +1,57 @@
+{
+  "author_batch": "batch_1",
+  "sets": [
+    {
+      "set_id": "S01",
+      "setting": "Transit-rich inner-city apartments with varied space and lifestyle priorities.",
+      "options": [
+        {"id": "A", "name": "Quiet Courtyard One-Bed", "values": [1450, 32, 48, 5, 48, 6, 4, 8, 4, 8]},
+        {"id": "B", "name": "Sunlit Station Studio", "values": [1680, 22, 40, 7, 42, 12, 7, 9, 2, 9]},
+        {"id": "C", "name": "Budget Garden Flat", "values": [1320, 45, 62, 4, 55, 3, 12, 6, 12, 5]},
+        {"id": "D", "name": "Premium Corner Loft", "values": [2100, 18, 55, 8, 38, 18, 5, 10, 8, 10]},
+        {"id": "E", "name": "Spacious Older Walk-Up", "values": [1550, 28, 72, 3, 60, 9, 16, 5, 18, 4]},
+        {"id": "F", "name": "Terrace Micro-Loft", "values": [1900, 35, 45, 6, 46, 3, 3, 7, 28, 7]}
+      ],
+      "design_notes": "A/B are a close quiet-space versus faster-brighter trade-off; C/D provide an easy budget-premium contrast; E/F balance interior area against terrace, lease flexibility, and errands."
+    },
+    {
+      "set_id": "S02",
+      "setting": "Outer-neighborhood rentals balancing commute access, family space, and lease flexibility.",
+      "options": [
+        {"id": "A", "name": "Greenway Two-Bed", "values": [1100, 52, 88, 6, 39, 6, 10, 7, 30, 6]},
+        {"id": "B", "name": "Railside New Build", "values": [1420, 38, 63, 8, 35, 12, 5, 9, 12, 9]},
+        {"id": "C", "name": "Value Courtyard Unit", "values": [980, 58, 70, 4, 48, 3, 18, 5, 14, 4]},
+        {"id": "D", "name": "Executive Park Apartment", "values": [1850, 28, 76, 7, 33, 18, 8, 10, 20, 10]},
+        {"id": "E", "name": "Large Patio Duplex", "values": [1280, 44, 105, 5, 43, 9, 15, 6, 45, 5]},
+        {"id": "F", "name": "Flexible Top-Floor Flat", "values": [1560, 34, 58, 9, 37, 3, 3, 8, 6, 8]}
+      ],
+      "design_notes": "B/F form a close modernity and commute versus flexible lease and light pair; C/D create a clear value-luxury tension; A/E split quiet convenience from much larger private space."
+    },
+    {
+      "set_id": "S03",
+      "setting": "Coastal-city apartments where outdoor space, quiet, and access conflict.",
+      "options": [
+        {"id": "A", "name": "Harbor Courtyard Flat", "values": [1750, 40, 54, 7, 45, 6, 6, 8, 10, 8]},
+        {"id": "B", "name": "Bay View Two-Bed", "values": [2050, 30, 68, 6, 50, 12, 12, 7, 36, 7]},
+        {"id": "C", "name": "Affordable Beachside Unit", "values": [1380, 55, 82, 5, 57, 3, 18, 5, 24, 4]},
+        {"id": "D", "name": "New Marina Residence", "values": [2450, 22, 61, 9, 41, 18, 5, 10, 18, 10]},
+        {"id": "E", "name": "Wide-Veranda Older Home", "values": [1600, 48, 96, 4, 52, 9, 20, 6, 50, 5]},
+        {"id": "F", "name": "Compact Surfside Loft", "values": [2180, 35, 47, 8, 43, 3, 3, 9, 4, 9]}
+      ],
+      "design_notes": "A/F are close on livability but exchange price and compactness for access and lease flexibility; B/E offer medium size-versus-outdoor trade-offs; C/D give an easy affordability versus polished access contrast."
+    },
+    {
+      "set_id": "S04",
+      "setting": "Mixed-density rentals near a growing employment district.",
+      "options": [
+        {"id": "A", "name": "Low-Rent Central Studio", "values": [1200, 25, 38, 5, 58, 3, 4, 6, 0, 5]},
+        {"id": "B", "name": "Connected Mid-Rise One-Bed", "values": [1500, 20, 52, 4, 49, 12, 9, 8, 5, 8]},
+        {"id": "C", "name": "Bright Business-District Flat", "values": [1750, 16, 46, 8, 44, 6, 5, 9, 8, 9]},
+        {"id": "D", "name": "Premium Garden Tower Unit", "values": [2200, 12, 70, 7, 36, 18, 8, 10, 22, 10]},
+        {"id": "E", "name": "Older Garden Duplex", "values": [1380, 34, 84, 3, 53, 9, 17, 5, 38, 4]},
+        {"id": "F", "name": "Sunlit Flexible Loft", "values": [1900, 28, 58, 9, 40, 3, 3, 7, 14, 7]}
+      ],
+      "design_notes": "B/C are a close access-and-modernity versus light-and-lease trade-off; A/D present an easy budget-premium contrast; E/F offer a medium large-garden versus bright-convenient choice."
+    }
+  ]
+}

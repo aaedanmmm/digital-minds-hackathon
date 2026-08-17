@@ -1,0 +1,1240 @@
+{
+  "sets": [
+    {
+      "set_id": "S01",
+      "setting": "Transit-rich inner-city apartments with varied space and lifestyle priorities.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Quiet Courtyard One-Bed",
+          "values": [
+            1450,
+            32,
+            48,
+            5,
+            48,
+            6,
+            4,
+            8,
+            4,
+            8
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Sunlit Station Studio",
+          "values": [
+            1680,
+            22,
+            40,
+            7,
+            42,
+            12,
+            7,
+            9,
+            2,
+            9
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Budget Garden Flat",
+          "values": [
+            1320,
+            45,
+            62,
+            4,
+            55,
+            3,
+            12,
+            6,
+            12,
+            5
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Premium Corner Loft",
+          "values": [
+            2100,
+            18,
+            55,
+            8,
+            38,
+            18,
+            5,
+            10,
+            8,
+            10
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Spacious Older Walk-Up",
+          "values": [
+            1550,
+            28,
+            72,
+            3,
+            60,
+            9,
+            16,
+            5,
+            18,
+            4
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Terrace Micro-Loft",
+          "values": [
+            1900,
+            35,
+            45,
+            6,
+            46,
+            3,
+            3,
+            7,
+            28,
+            7
+          ]
+        }
+      ],
+      "design_notes": "A/B are a close quiet-space versus faster-brighter trade-off; C/D provide an easy budget-premium contrast; E/F balance interior area against terrace, lease flexibility, and errands."
+    },
+    {
+      "set_id": "S02",
+      "setting": "Outer-neighborhood rentals balancing commute access, family space, and lease flexibility.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Greenway Two-Bed",
+          "values": [
+            1100,
+            52,
+            88,
+            6,
+            39,
+            6,
+            10,
+            7,
+            30,
+            6
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Railside New Build",
+          "values": [
+            1420,
+            38,
+            63,
+            8,
+            35,
+            12,
+            5,
+            9,
+            12,
+            9
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Value Courtyard Unit",
+          "values": [
+            980,
+            58,
+            70,
+            4,
+            48,
+            3,
+            18,
+            5,
+            14,
+            4
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Executive Park Apartment",
+          "values": [
+            1850,
+            28,
+            76,
+            7,
+            33,
+            18,
+            8,
+            10,
+            20,
+            10
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Large Patio Duplex",
+          "values": [
+            1280,
+            44,
+            105,
+            5,
+            43,
+            9,
+            15,
+            6,
+            45,
+            5
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Flexible Top-Floor Flat",
+          "values": [
+            1560,
+            34,
+            58,
+            9,
+            37,
+            3,
+            3,
+            8,
+            6,
+            8
+          ]
+        }
+      ],
+      "design_notes": "B/F form a close modernity and commute versus flexible lease and light pair; C/D create a clear value-luxury tension; A/E split quiet convenience from much larger private space."
+    },
+    {
+      "set_id": "S03",
+      "setting": "Coastal-city apartments where outdoor space, quiet, and access conflict.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Harbor Courtyard Flat",
+          "values": [
+            1750,
+            40,
+            54,
+            7,
+            45,
+            6,
+            6,
+            8,
+            10,
+            8
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Bay View Two-Bed",
+          "values": [
+            2050,
+            30,
+            68,
+            6,
+            50,
+            12,
+            12,
+            7,
+            36,
+            7
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Affordable Beachside Unit",
+          "values": [
+            1380,
+            55,
+            82,
+            5,
+            57,
+            3,
+            18,
+            5,
+            24,
+            4
+          ]
+        },
+        {
+          "id": "D",
+          "name": "New Marina Residence",
+          "values": [
+            2450,
+            22,
+            61,
+            9,
+            41,
+            18,
+            5,
+            10,
+            18,
+            10
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Wide-Veranda Older Home",
+          "values": [
+            1600,
+            48,
+            96,
+            4,
+            52,
+            9,
+            20,
+            6,
+            50,
+            5
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Compact Surfside Loft",
+          "values": [
+            2180,
+            35,
+            47,
+            8,
+            43,
+            3,
+            3,
+            9,
+            4,
+            9
+          ]
+        }
+      ],
+      "design_notes": "A/F are close on livability but exchange price and compactness for access and lease flexibility; B/E offer medium size-versus-outdoor trade-offs; C/D give an easy affordability versus polished access contrast."
+    },
+    {
+      "set_id": "S04",
+      "setting": "Mixed-density rentals near a growing employment district.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Low-Rent Central Studio",
+          "values": [
+            1200,
+            25,
+            38,
+            5,
+            58,
+            3,
+            4,
+            6,
+            0,
+            5
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Connected Mid-Rise One-Bed",
+          "values": [
+            1500,
+            20,
+            52,
+            4,
+            49,
+            12,
+            9,
+            8,
+            5,
+            8
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Bright Business-District Flat",
+          "values": [
+            1750,
+            16,
+            46,
+            8,
+            44,
+            6,
+            5,
+            9,
+            8,
+            9
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Premium Garden Tower Unit",
+          "values": [
+            2200,
+            12,
+            70,
+            7,
+            36,
+            18,
+            8,
+            10,
+            22,
+            10
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Older Garden Duplex",
+          "values": [
+            1380,
+            34,
+            84,
+            3,
+            53,
+            9,
+            17,
+            5,
+            38,
+            4
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Sunlit Flexible Loft",
+          "values": [
+            1900,
+            28,
+            58,
+            9,
+            40,
+            3,
+            3,
+            7,
+            14,
+            7
+          ]
+        }
+      ],
+      "design_notes": "B/C are a close access-and-modernity versus light-and-lease trade-off; A/D present an easy budget-premium contrast; E/F offer a medium large-garden versus bright-convenient choice."
+    },
+    {
+      "set_id": "S05",
+      "setting": "Mixed-density neighborhood near a central business district",
+      "options": [
+        {
+          "id": "A",
+          "name": "Maple Court One-Bedroom",
+          "values": [
+            1850,
+            22,
+            58,
+            6,
+            51,
+            6,
+            5,
+            7,
+            5,
+            7
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Riverside Garden Flat",
+          "values": [
+            1720,
+            32,
+            72,
+            7,
+            55,
+            12,
+            9,
+            6,
+            12,
+            6
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Station Loft",
+          "values": [
+            2140,
+            14,
+            46,
+            5,
+            43,
+            6,
+            4,
+            9,
+            2,
+            9
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Old Mill Apartment",
+          "values": [
+            1490,
+            40,
+            85,
+            8,
+            60,
+            18,
+            15,
+            5,
+            18,
+            5
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Juniper Residence",
+          "values": [
+            2380,
+            18,
+            64,
+            7,
+            48,
+            3,
+            7,
+            8,
+            9,
+            8
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Quiet Lane Studio",
+          "values": [
+            1960,
+            27,
+            54,
+            4,
+            38,
+            9,
+            3,
+            10,
+            0,
+            8
+          ]
+        }
+      ],
+      "design_notes": "C and E are close urban-convenience choices with different space and lease compromises; B and F form a close value-versus-quietness comparison. D is an easy budget-and-space trade-off, while A provides a medium balanced comparison."
+    },
+    {
+      "set_id": "S06",
+      "setting": "Outer-suburban rentals for commuters and home-focused renters",
+      "options": [
+        {
+          "id": "A",
+          "name": "Willow Family Unit",
+          "values": [
+            1320,
+            48,
+            92,
+            8,
+            42,
+            12,
+            11,
+            6,
+            28,
+            5
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Civic Square Apartment",
+          "values": [
+            1710,
+            31,
+            68,
+            6,
+            47,
+            6,
+            6,
+            8,
+            10,
+            8
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Budget Corner Flat",
+          "values": [
+            1090,
+            56,
+            61,
+            5,
+            54,
+            18,
+            18,
+            5,
+            16,
+            4
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Parkline Townhouse",
+          "values": [
+            2050,
+            24,
+            78,
+            7,
+            39,
+            9,
+            8,
+            9,
+            14,
+            9
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Meadow Terrace Home",
+          "values": [
+            1580,
+            38,
+            105,
+            6,
+            58,
+            24,
+            14,
+            4,
+            40,
+            6
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Sunset Rail Apartment",
+          "values": [
+            1860,
+            44,
+            74,
+            9,
+            45,
+            3,
+            5,
+            7,
+            5,
+            7
+          ]
+        }
+      ],
+      "design_notes": "B and F are close choices: B improves commute and efficiency, while F trades those for light, a very short lease, and nearby essentials. A versus D is a medium cost-space versus access-quality comparison; C and E make easier budget and large-home trade-offs."
+    },
+    {
+      "set_id": "S07",
+      "setting": "Coastal city rentals balancing beach access with city connections",
+      "options": [
+        {
+          "id": "A",
+          "name": "Harbor View Apartment",
+          "values": [
+            2210,
+            35,
+            76,
+            8,
+            46,
+            12,
+            10,
+            7,
+            24,
+            7
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Seabreeze Duplex",
+          "values": [
+            1780,
+            48,
+            89,
+            7,
+            51,
+            6,
+            12,
+            6,
+            36,
+            6
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Marina Micro-Loft",
+          "values": [
+            2490,
+            22,
+            54,
+            6,
+            43,
+            9,
+            5,
+            9,
+            8,
+            9
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Clifftop Walk-Up",
+          "values": [
+            1540,
+            55,
+            68,
+            9,
+            58,
+            18,
+            18,
+            5,
+            18,
+            4
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Beacon House",
+          "values": [
+            2670,
+            31,
+            101,
+            8,
+            49,
+            24,
+            14,
+            8,
+            30,
+            8
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Cove Garden Studio",
+          "values": [
+            1980,
+            39,
+            62,
+            5,
+            38,
+            3,
+            4,
+            10,
+            4,
+            8
+          ]
+        }
+      ],
+      "design_notes": "A and E are close premium space-and-light choices, separated by rent, lease length, and convenience. C and F are a close modern efficient city option versus a quieter flexible option. B, D, and E establish medium and easy trade-offs around price, size, commute, and outdoor space."
+    },
+    {
+      "set_id": "S08",
+      "setting": "Established inner-ring rentals with varied building types",
+      "options": [
+        {
+          "id": "A",
+          "name": "Elm Street One-Bedroom",
+          "values": [
+            1650,
+            28,
+            52,
+            5,
+            48,
+            6,
+            4,
+            8,
+            4,
+            8
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Market Garden Flat",
+          "values": [
+            1380,
+            43,
+            76,
+            7,
+            56,
+            12,
+            10,
+            6,
+            10,
+            6
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Metro Pod Apartment",
+          "values": [
+            2130,
+            18,
+            43,
+            4,
+            42,
+            3,
+            3,
+            9,
+            0,
+            10
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Linden Corner Unit",
+          "values": [
+            1810,
+            35,
+            69,
+            8,
+            50,
+            9,
+            7,
+            7,
+            14,
+            7
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Brickworks Loft",
+          "values": [
+            2360,
+            25,
+            88,
+            6,
+            45,
+            18,
+            9,
+            8,
+            22,
+            9
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Hillcrest House",
+          "values": [
+            1520,
+            51,
+            96,
+            9,
+            61,
+            24,
+            16,
+            5,
+            34,
+            5
+          ]
+        }
+      ],
+      "design_notes": "A and C are close compact-city choices with contrasting rent, natural light, and lease flexibility. D and E create a medium size-and-outdoor-space versus cost-and-lease comparison. B and F offer easier low-rent, larger-home choices with distinct commute, noise, and access penalties."
+    },
+    {
+      "set_id": "S09",
+      "setting": "Rentals for a hybrid worker choosing between a downtown office and neighborhood life.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Sunlit heritage flat",
+          "values": [
+            1780,
+            32,
+            58,
+            8,
+            46,
+            12,
+            6,
+            4,
+            4,
+            4
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Compact station studio",
+          "values": [
+            1510,
+            12,
+            31,
+            4,
+            62,
+            6,
+            3,
+            8,
+            0,
+            9
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Garden duplex",
+          "values": [
+            2240,
+            41,
+            93,
+            6,
+            38,
+            18,
+            14,
+            5,
+            28,
+            5
+          ]
+        },
+        {
+          "id": "D",
+          "name": "New riverside one-bedroom",
+          "values": [
+            2180,
+            20,
+            54,
+            7,
+            45,
+            6,
+            7,
+            10,
+            9,
+            10
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Quiet outer-neighborhood unit",
+          "values": [
+            1280,
+            54,
+            67,
+            5,
+            34,
+            3,
+            19,
+            6,
+            12,
+            3
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Shared-courtyard loft",
+          "values": [
+            1960,
+            19,
+            47,
+            5,
+            56,
+            15,
+            5,
+            7,
+            18,
+            7
+          ]
+        }
+      ],
+      "design_notes": "B versus F is a close commute-and-lease trade-off, while B versus D is a medium cost-and-space contrast. D creates clear easy pairs through its modernity and access; E gives the budget/quiet counterpoint, and C exchanges access for room and outdoor space."
+    },
+    {
+      "set_id": "S10",
+      "setting": "Rental search for someone balancing university access, weekend hosting, and a calm home.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Campus-edge terrace",
+          "values": [
+            1690,
+            9,
+            46,
+            5,
+            64,
+            12,
+            4,
+            6,
+            8,
+            5
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Leafy two-bedroom",
+          "values": [
+            2180,
+            37,
+            82,
+            7,
+            37,
+            18,
+            16,
+            5,
+            22,
+            4
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Efficient corner apartment",
+          "values": [
+            2070,
+            18,
+            55,
+            8,
+            51,
+            6,
+            7,
+            10,
+            3,
+            10
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Budget garden unit",
+          "values": [
+            1160,
+            48,
+            61,
+            4,
+            41,
+            3,
+            18,
+            4,
+            19,
+            2
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Top-floor entertainment district flat",
+          "values": [
+            1920,
+            14,
+            42,
+            9,
+            68,
+            9,
+            3,
+            7,
+            5,
+            8
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Renovated local-center apartment",
+          "values": [
+            1840,
+            29,
+            65,
+            6,
+            45,
+            15,
+            5,
+            8,
+            11,
+            8
+          ]
+        }
+      ],
+      "design_notes": "C and F are close efficiency-versus-space choices, and A versus E is a close access-versus-light trade-off. D creates an easy price/lease contrast; B is the quiet hosting option with a longer commute."
+    },
+    {
+      "set_id": "S11",
+      "setting": "Homes for a couple deciding between a short commute, home working space, and outdoor living.",
+      "options": [
+        {
+          "id": "A",
+          "name": "City micro-loft",
+          "values": [
+            1580,
+            8,
+            34,
+            6,
+            65,
+            6,
+            2,
+            9,
+            0,
+            9
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Park-facing apartment",
+          "values": [
+            2260,
+            28,
+            71,
+            8,
+            39,
+            12,
+            11,
+            6,
+            6,
+            6
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Suburban courtyard home",
+          "values": [
+            2470,
+            52,
+            112,
+            6,
+            35,
+            24,
+            20,
+            5,
+            39,
+            5
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Flexible rail-line flat",
+          "values": [
+            1850,
+            22,
+            57,
+            5,
+            53,
+            3,
+            6,
+            7,
+            14,
+            7
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Older neighborhood walk-up",
+          "values": [
+            1210,
+            39,
+            63,
+            4,
+            43,
+            9,
+            4,
+            3,
+            2,
+            3
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Modern balcony apartment",
+          "values": [
+            2140,
+            16,
+            49,
+            7,
+            57,
+            15,
+            9,
+            10,
+            10,
+            10
+          ]
+        }
+      ],
+      "design_notes": "B and F are close quiet-space versus commute-modernity alternatives; D versus E is a medium flexibility/access trade-off. A offers an easy commute-focused contrast, while C trades almost all access and lease flexibility for family-scale room and outdoor space."
+    },
+    {
+      "set_id": "S12",
+      "setting": "Rental options for a remote worker who still visits the city several times each week.",
+      "options": [
+        {
+          "id": "A",
+          "name": "Village-center cottage",
+          "values": [
+            2030,
+            35,
+            76,
+            7,
+            36,
+            12,
+            3,
+            4,
+            24,
+            4
+          ]
+        },
+        {
+          "id": "B",
+          "name": "Transit hub studio",
+          "values": [
+            1390,
+            7,
+            29,
+            4,
+            63,
+            6,
+            2,
+            8,
+            0,
+            9
+          ]
+        },
+        {
+          "id": "C",
+          "name": "Bright renovated one-bedroom",
+          "values": [
+            2180,
+            21,
+            52,
+            9,
+            48,
+            9,
+            8,
+            10,
+            4,
+            10
+          ]
+        },
+        {
+          "id": "D",
+          "name": "Affordable quiet flat",
+          "values": [
+            1190,
+            46,
+            59,
+            5,
+            33,
+            3,
+            17,
+            5,
+            7,
+            3
+          ]
+        },
+        {
+          "id": "E",
+          "name": "Warehouse district loft",
+          "values": [
+            1810,
+            15,
+            68,
+            6,
+            59,
+            18,
+            5,
+            7,
+            16,
+            7
+          ]
+        },
+        {
+          "id": "F",
+          "name": "Greenbelt townhouse",
+          "values": [
+            2580,
+            57,
+            104,
+            8,
+            40,
+            24,
+            22,
+            6,
+            44,
+            6
+          ]
+        }
+      ],
+      "design_notes": "A and E are a close quiet/outdoor versus commute/area trade-off; C and E form a medium modernity-light versus room-outdoor pair. B versus D is an easy access-versus-quiet/budget contrast, and F is the spacious outdoor extreme."
+    }
+  ]
+}
