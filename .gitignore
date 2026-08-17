@@ -35,3 +35,6 @@ tmp/
 # persona-elicitation/captures/ -- never commit these).
 q3/results/persona-vectors/raw/
 *.npy
+
+# Git worktrees
+.worktrees/
