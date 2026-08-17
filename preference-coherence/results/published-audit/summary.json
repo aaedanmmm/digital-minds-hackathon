@@ -1,0 +1,180 @@
+{
+  "records": 2430,
+  "order_consistency": {
+    "k5": 0.9777777777777777,
+    "k10": 0.8666666666666667,
+    "k5_worse_k10_consistent": 1,
+    "k10_worse_k5_consistent": 6,
+    "paired_exact_p": 0.125
+  },
+  "position_bias": {
+    "k5": {
+      "first": 414,
+      "n": 810,
+      "rate": 0.5111111111111111
+    },
+    "k10": {
+      "first": 445,
+      "n": 810,
+      "rate": 0.5493827160493827
+    },
+    "naive_fisher_p": 0.13529517456035162,
+    "pair_level_mean_change": 0.03827160493827161,
+    "pair_level_wilcoxon_p": 0.019384090626299547
+  },
+  "transitive_null_by_cell": {
+    "k3_tb512": {
+      "observed_cycles": 4,
+      "observed_order_consistency": 0.9777777777777777,
+      "position_log_odds": 0.17333723493221553,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        1.0
+      ],
+      "cycle_tail_probability": 0.0005998800239952009,
+      "null_order_median": 0.9111111111111111,
+      "null_order_interval_95": [
+        0.8444444444444444,
+        0.9777777777777777
+      ],
+      "order_tail_probability": 0.9846030793841232
+    },
+    "k3_tb4096": {
+      "observed_cycles": 1,
+      "observed_order_consistency": 0.9555555555555556,
+      "position_log_odds": 0.41458604400360727,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        1.0
+      ],
+      "cycle_tail_probability": 0.0613877224555089,
+      "null_order_median": 0.9111111111111111,
+      "null_order_interval_95": [
+        0.8444444444444444,
+        0.9777777777777777
+      ],
+      "order_tail_probability": 0.9270145970805839
+    },
+    "k3_tb8192": {
+      "observed_cycles": 2,
+      "observed_order_consistency": 0.9555555555555556,
+      "position_log_odds": 0.2394663777284299,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        1.0
+      ],
+      "cycle_tail_probability": 0.013997200559888023,
+      "null_order_median": 0.9333333333333333,
+      "null_order_interval_95": [
+        0.8666666666666667,
+        0.9777777777777777
+      ],
+      "order_tail_probability": 0.9002199560087982
+    },
+    "k5_tb512": {
+      "observed_cycles": 0,
+      "observed_order_consistency": 1.0,
+      "position_log_odds": 0.18219002408443577,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        0.0
+      ],
+      "cycle_tail_probability": 1.0,
+      "null_order_median": 0.9555555555555556,
+      "null_order_interval_95": [
+        0.9111111111111111,
+        1.0
+      ],
+      "order_tail_probability": 1.0
+    },
+    "k5_tb4096": {
+      "observed_cycles": 0,
+      "observed_order_consistency": 0.9777777777777777,
+      "position_log_odds": 0.26655428622430416,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        0.0
+      ],
+      "cycle_tail_probability": 1.0,
+      "null_order_median": 0.9555555555555556,
+      "null_order_interval_95": [
+        0.9111111111111111,
+        1.0
+      ],
+      "order_tail_probability": 0.9128174365126974
+    },
+    "k5_tb8192": {
+      "observed_cycles": 0,
+      "observed_order_consistency": 0.9333333333333333,
+      "position_log_odds": 0.3282262349677344,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        0.0
+      ],
+      "cycle_tail_probability": 1.0,
+      "null_order_median": 0.9555555555555556,
+      "null_order_interval_95": [
+        0.8888888888888888,
+        1.0
+      ],
+      "order_tail_probability": 0.4505098980203959
+    },
+    "k10_tb512": {
+      "observed_cycles": 1,
+      "observed_order_consistency": 0.9111111111111111,
+      "position_log_odds": 0.6555689333862634,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        1.0
+      ],
+      "cycle_tail_probability": 0.1209758048390322,
+      "null_order_median": 0.8888888888888888,
+      "null_order_interval_95": [
+        0.8222222222222222,
+        0.9555555555555556
+      ],
+      "order_tail_probability": 0.8058388322335532
+    },
+    "k10_tb4096": {
+      "observed_cycles": 2,
+      "observed_order_consistency": 0.9333333333333333,
+      "position_log_odds": 0.4379372238411648,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        2.0
+      ],
+      "cycle_tail_probability": 0.0639872025594881,
+      "null_order_median": 0.8888888888888888,
+      "null_order_interval_95": [
+        0.8,
+        0.9555555555555556
+      ],
+      "order_tail_probability": 0.9408118376324736
+    },
+    "k10_tb8192": {
+      "observed_cycles": 1,
+      "observed_order_consistency": 0.8444444444444444,
+      "position_log_odds": 0.9096114134373,
+      "null_cycles_median": 0.0,
+      "null_cycles_interval_95": [
+        0.0,
+        2.0
+      ],
+      "cycle_tail_probability": 0.2435512897420516,
+      "null_order_median": 0.8444444444444444,
+      "null_order_interval_95": [
+        0.7555555555555555,
+        0.9111111111111111
+      ],
+      "order_tail_probability": 0.6970605878824235
+    }
+  }
+}

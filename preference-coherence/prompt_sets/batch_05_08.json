@@ -1,0 +1,57 @@
+{
+  "author_batch": "batch_05_08",
+  "sets": [
+    {
+      "set_id": "S05",
+      "setting": "Mixed-density neighborhood near a central business district",
+      "options": [
+        {"id": "A", "name": "Maple Court One-Bedroom", "values": [1850, 22, 58, 6, 51, 6, 5, 7, 5, 7]},
+        {"id": "B", "name": "Riverside Garden Flat", "values": [1720, 32, 72, 7, 55, 12, 9, 6, 12, 6]},
+        {"id": "C", "name": "Station Loft", "values": [2140, 14, 46, 5, 43, 6, 4, 9, 2, 9]},
+        {"id": "D", "name": "Old Mill Apartment", "values": [1490, 40, 85, 8, 60, 18, 15, 5, 18, 5]},
+        {"id": "E", "name": "Juniper Residence", "values": [2380, 18, 64, 7, 48, 3, 7, 8, 9, 8]},
+        {"id": "F", "name": "Quiet Lane Studio", "values": [1960, 27, 54, 4, 38, 9, 3, 10, 0, 8]}
+      ],
+      "design_notes": "C and E are close urban-convenience choices with different space and lease compromises; B and F form a close value-versus-quietness comparison. D is an easy budget-and-space trade-off, while A provides a medium balanced comparison."
+    },
+    {
+      "set_id": "S06",
+      "setting": "Outer-suburban rentals for commuters and home-focused renters",
+      "options": [
+        {"id": "A", "name": "Willow Family Unit", "values": [1320, 48, 92, 8, 42, 12, 11, 6, 28, 5]},
+        {"id": "B", "name": "Civic Square Apartment", "values": [1710, 31, 68, 6, 47, 6, 6, 8, 10, 8]},
+        {"id": "C", "name": "Budget Corner Flat", "values": [1090, 56, 61, 5, 54, 18, 18, 5, 16, 4]},
+        {"id": "D", "name": "Parkline Townhouse", "values": [2050, 24, 78, 7, 39, 9, 8, 9, 14, 9]},
+        {"id": "E", "name": "Meadow Terrace Home", "values": [1580, 38, 105, 6, 58, 24, 14, 4, 40, 6]},
+        {"id": "F", "name": "Sunset Rail Apartment", "values": [1860, 44, 74, 9, 45, 3, 5, 7, 5, 7]}
+      ],
+      "design_notes": "B and F are close choices: B improves commute and efficiency, while F trades those for light, a very short lease, and nearby essentials. A versus D is a medium cost-space versus access-quality comparison; C and E make easier budget and large-home trade-offs."
+    },
+    {
+      "set_id": "S07",
+      "setting": "Coastal city rentals balancing beach access with city connections",
+      "options": [
+        {"id": "A", "name": "Harbor View Apartment", "values": [2210, 35, 76, 8, 46, 12, 10, 7, 24, 7]},
+        {"id": "B", "name": "Seabreeze Duplex", "values": [1780, 48, 89, 7, 51, 6, 12, 6, 36, 6]},
+        {"id": "C", "name": "Marina Micro-Loft", "values": [2490, 22, 54, 6, 43, 9, 5, 9, 8, 9]},
+        {"id": "D", "name": "Clifftop Walk-Up", "values": [1540, 55, 68, 9, 58, 18, 18, 5, 18, 4]},
+        {"id": "E", "name": "Beacon House", "values": [2670, 31, 101, 8, 49, 24, 14, 8, 30, 8]},
+        {"id": "F", "name": "Cove Garden Studio", "values": [1980, 39, 62, 5, 38, 3, 4, 10, 4, 8]}
+      ],
+      "design_notes": "A and E are close premium space-and-light choices, separated by rent, lease length, and convenience. C and F are a close modern efficient city option versus a quieter flexible option. B, D, and E establish medium and easy trade-offs around price, size, commute, and outdoor space."
+    },
+    {
+      "set_id": "S08",
+      "setting": "Established inner-ring rentals with varied building types",
+      "options": [
+        {"id": "A", "name": "Elm Street One-Bedroom", "values": [1650, 28, 52, 5, 48, 6, 4, 8, 4, 8]},
+        {"id": "B", "name": "Market Garden Flat", "values": [1380, 43, 76, 7, 56, 12, 10, 6, 10, 6]},
+        {"id": "C", "name": "Metro Pod Apartment", "values": [2130, 18, 43, 4, 42, 3, 3, 9, 0, 10]},
+        {"id": "D", "name": "Linden Corner Unit", "values": [1810, 35, 69, 8, 50, 9, 7, 7, 14, 7]},
+        {"id": "E", "name": "Brickworks Loft", "values": [2360, 25, 88, 6, 45, 18, 9, 8, 22, 9]},
+        {"id": "F", "name": "Hillcrest House", "values": [1520, 51, 96, 9, 61, 24, 16, 5, 34, 5]}
+      ],
+      "design_notes": "A and C are close compact-city choices with contrasting rent, natural light, and lease flexibility. D and E create a medium size-and-outdoor-space versus cost-and-lease comparison. B and F offer easier low-rent, larger-home choices with distinct commute, noise, and access penalties."
+    }
+  ]
+}
