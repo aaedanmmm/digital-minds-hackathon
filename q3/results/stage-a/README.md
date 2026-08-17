@@ -39,24 +39,49 @@ The ladder rungs were:
 
 ## Results
 
-| Arm | Persona | Applicable items | Control baseline | L1 | L2 | L3 | L4 | Winning rung |
-|---|---|---:|---:|---:|---:|---:|---:|---:|
-| A2 | General-purpose assistant | 10 | 7/10 (70.0%) | 7/10 (70.0%) | 7/10 (70.0%) | 7/10 (70.0%) | 0/10 (0.0%) | None |
-| A3 | Art historian | 9 | 5/9 (55.6%) | 6/9 (66.7%) | 7/9 (77.8%) | 8/9 (88.9%) | 4/9 (44.4%) | **L3** |
-| A4 | Physician | 10 | 6/10 (60.0%) | 6/10 (60.0%) | 10/10 (100.0%) | 10/10 (100.0%) | 0/10 (0.0%) | **L2** |
-| A5 | Value-inverted assistant | 6 | 1/6 (16.7%) | 4/6 (66.7%) | 5/6 (83.3%) | 5/6 (83.3%) | 3/6 (50.0%) | **L1** |
-| A6 | Refusal-suppressed assistant | 5 | 3/5 (60.0%) | 3/5 (60.0%) | 5/5 (100.0%) | 5/5 (100.0%) | 0/5 (0.0%) | **L2** |
+Table 1 reports the proportion of each persona's applicable items for which
+the model selected the preregistered persona-consistent option. The control
+column is the model's corresponding rate without that persona prompt (using
+the higher of the no-prompt and length-matched controls). A condition was
+selected for follow-up when it exceeded its control rate by at least 33⅓
+percentage points; the first rung to meet that criterion is shown in the final
+column.
 
-The winning-rung improvements over control were exactly 33⅓ percentage points
-for A3, 40 points for A4, 50 points for A5, and 40 points for A6. A3 therefore
-cleared the threshold at its boundary; a single changed answer would change
-its screening outcome. A4 and A6 show a sharp step between L1 and L2, while A5
-already shifts substantially at L1 and strengthens further at L2 and L3.
+| Persona condition | Items scored | Control | L1: role only | L2: character card | L3: card + examples | L4: card + examples + persistence prompt | Selected rung |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| General-purpose assistant (A2) | 10 | 70.0% (7/10) | 70.0% (7/10) | 70.0% (7/10) | 70.0% (7/10) | 0.0% (0/10)* | None |
+| Art historian (A3) | 9 | 55.6% (5/9) | 66.7% (6/9) | 77.8% (7/9) | 88.9% (8/9) | 44.4% (4/9)* | L3 |
+| Physician (A4) | 10 | 60.0% (6/10) | 60.0% (6/10) | 100.0% (10/10) | 100.0% (10/10) | 0.0% (0/10)* | L2 |
+| Value-inverted assistant (A5) | 6 | 16.7% (1/6) | 66.7% (4/6) | 83.3% (5/6) | 83.3% (5/6) | 50.0% (3/6)* | L1 |
+| Refusal-suppressed assistant (A6) | 5 | 60.0% (3/5) | 60.0% (3/5) | 100.0% (5/5) | 100.0% (5/5) | 0.0% (0/5)* | L2 |
 
-A2 matched its 70% control baseline at every fully parsed rung. Its failure to
-produce a winner is not fully diagnostic: with a 70% baseline, the required
-33⅓-point improvement would demand a take-rate above 100%. Under this rule A2
-could not qualify, even with perfect agreement on all ten applicable items.
+*L4 take-rates are not substantively interpretable because its response
+prefill caused frequent failures to produce a parseable answer tag. The L4
+results are retained for completeness; the failure is reported separately
+below.
+
+Four persona conditions met the selection criterion. The value-inverted
+assistant was selected at the first rung: a role statement alone increased the
+persona-consistent response rate from 16.7% to 66.7%. The physician and
+refusal-suppressed conditions first met the criterion after the full character
+card was added (L2), increasing from 60.0% to 100.0% in both cases. The art
+historian condition required the character card and examples (L3), increasing
+from 55.6% to 88.9%.
+
+The art historian result met the threshold exactly: its 33.3-percentage-point
+increase corresponds to three additional persona-consistent responses out of
+nine scored items. It should therefore be treated as a screening selection to
+be tested in Stage B, rather than as a precise estimate of effect size. The
+larger observed changes for the physician, value-inverted, and
+refusal-suppressed conditions are likewise based on small numbers of applicable
+items and require replication in the follow-up stage.
+
+The general-purpose assistant condition did not yield a selected rung. Its
+rate remained identical to the 70.0% control rate at L1-L3. This is not a
+decisive negative result: the preregistered criterion requires an improvement
+of 33⅓ percentage points, but adding that margin to a 70.0% control rate would
+require a result above 100%. The screen therefore cannot distinguish this
+prompted assistant identity from the model's default response pattern.
 
 ## L4 format failure
 
