@@ -1,0 +1,10 @@
+domain,from,to,n,switches,switch_rate,option_1_to_option_2,option_2_to_option_1,exact_mcnemar_p
+aesthetic,none,short,100,6,0.06,4,2,0.6875
+aesthetic,short,long,100,3,0.03,2,1,1.0
+aesthetic,none,long,100,7,0.07,5,2,0.453125
+utility,none,short,100,9,0.09,7,2,0.1796875
+utility,short,long,100,11,0.11,4,7,0.548828125
+utility,none,long,100,10,0.1,6,4,0.75390625
+all,none,short,200,15,0.075,11,4,0.11846923828125
+all,short,long,200,14,0.07,6,8,0.79052734375
+all,none,long,200,17,0.085,11,6,0.332305908203125

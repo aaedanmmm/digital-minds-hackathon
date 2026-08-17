@@ -36,5 +36,5 @@ minimum allocation around 1,024 tokens, which is not genuinely short.
 From the repository root, run
 [`../../run_qwen_preference_reasoning_study.py`](../../run_qwen_preference_reasoning_study.py)
 to resume collection and
-[`../../summarize_qwen_preference_reasoning_study.py`](../../summarize_qwen_preference_reasoning_study.py)
+[`../../summarize_preference_reasoning_study.py`](../../summarize_preference_reasoning_study.py)
 to regenerate summaries.

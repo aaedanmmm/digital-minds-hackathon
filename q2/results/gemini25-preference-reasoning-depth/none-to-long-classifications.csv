@@ -1,0 +1,18 @@
+domain,preference_id,repetition,choice_change,short_matches,classification,mechanism
+aesthetic,symmetry_irregularity,4,option1_to_option2,long,Q,qualitative consequence aggregation
+aesthetic,hook_development,0,option1_to_option2,long,B,background principle
+aesthetic,detail_space,6,option1_to_option2,long,B,background principle
+aesthetic,ease_friction,0,option1_to_option2,long,Q,qualitative consequence aggregation
+aesthetic,ease_friction,1,option2_to_option1,none,Q,qualitative consequence aggregation
+aesthetic,ease_friction,2,option2_to_option1,long,Q,qualitative consequence aggregation
+aesthetic,ease_friction,6,option1_to_option2,none,Q,qualitative consequence aggregation
+utility,miners_dam,1,option1_to_option2,none,N,explicit numeric calculation
+utility,miners_dam,7,option1_to_option2,none,N,explicit numeric calculation
+utility,report_source,0,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,report_source,6,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,flood_ecology,1,option2_to_option1,none,B,background principle
+utility,flood_ecology,2,option1_to_option2,long,B,background principle
+utility,flood_ecology,3,option2_to_option1,long,B,background principle
+utility,flood_ecology,5,option2_to_option1,none,B,background principle
+utility,flood_ecology,7,option2_to_option1,none,B,background principle
+utility,flood_ecology,8,option1_to_option2,none,B,background principle

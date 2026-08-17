@@ -1,0 +1,15 @@
+domain,preference_id,repetition,choice_change,none_matches,overlaps_none_to_long,classification,mechanism
+aesthetic,ease_friction,1,option2_to_option1,short,true,Q,qualitative consequence aggregation
+aesthetic,ease_friction,6,option1_to_option2,short,true,Q,qualitative consequence aggregation
+aesthetic,ease_friction,8,option1_to_option2,long,false,Q,qualitative consequence aggregation
+utility,flood_ecology,0,option2_to_option1,long,false,B,background principle
+utility,flood_ecology,1,option2_to_option1,short,true,B,background principle
+utility,flood_ecology,4,option2_to_option1,long,false,B,background principle
+utility,flood_ecology,5,option2_to_option1,short,true,B,background principle
+utility,flood_ecology,6,option2_to_option1,long,false,B,background principle
+utility,flood_ecology,7,option2_to_option1,short,true,B,background principle
+utility,flood_ecology,8,option1_to_option2,short,true,B,background principle
+utility,flood_ecology,9,option2_to_option1,long,false,B,background principle
+utility,miners_dam,1,option1_to_option2,short,true,N,explicit numeric calculation
+utility,miners_dam,3,option1_to_option2,long,false,N,explicit numeric calculation
+utility,miners_dam,7,option1_to_option2,short,true,N,explicit numeric calculation
