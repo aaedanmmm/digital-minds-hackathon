@@ -26,7 +26,24 @@ def default_predictions() -> dict[str, dict[str, str]]:
 
 
 def load_records(directory: str) -> list[dict]:
-    return [json.loads(p.read_text()) for p in Path(directory).glob("*.json")]
+    """Load generation records from a directory, skipping non-record JSON files.
+
+    A valid record is a JSON object containing at least the keys 'arm', 'item',
+    and 'answer'. Files that don't meet this criterion (summaries, configs, etc.)
+    are silently skipped rather than raising.
+    """
+    records = []
+    for p in Path(directory).glob("*.json"):
+        try:
+            obj = json.loads(p.read_text())
+        except (json.JSONDecodeError, ValueError):
+            # Skip malformed JSON files
+            continue
+
+        # Check if this is a valid record (has required keys)
+        if isinstance(obj, dict) and all(key in obj for key in ("arm", "item", "answer")):
+            records.append(obj)
+    return records
 
 
 def take_rate(records, scored_arm: str, target_persona: str, rung: str,

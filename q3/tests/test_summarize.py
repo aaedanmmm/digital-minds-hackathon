@@ -1,7 +1,11 @@
 # tests/test_summarize.py
+import json
 import pytest
+import tempfile
+from pathlib import Path
 from personas.summarize import (
     take_rate, control_baseline, winning_rungs, unparsed_stats, summarize,
+    load_records,
 )
 
 # Six items predict A3 (all "B"); three of those also predict A5 (all "A").
@@ -215,3 +219,58 @@ def test_summarize_unparsed_does_not_mask_a_high_take_rate_as_clean():
     out = summarize(recs)
     assert out["take_rates"]["A3|L4"] == pytest.approx(2 / 6)
     assert out["unparsed"]["A3|L4"]["rate"] == pytest.approx(4 / 6)
+
+
+# --- load_records robustness: skip non-record files ---
+
+def test_load_records_skips_summary_json():
+    """A directory with valid records plus summary.json loads only the records."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Write two valid records
+        rec1 = {"arm": "A0", "rung": "L1", "item": "i0", "answer": "A", "condition": "think_off"}
+        rec2 = {"arm": "A0", "rung": "L1", "item": "i1", "answer": "B", "condition": "think_off"}
+        Path(tmpdir, "rec1.json").write_text(json.dumps(rec1))
+        Path(tmpdir, "rec2.json").write_text(json.dumps(rec2))
+
+        # Write a summary.json that looks like analysis output (not a record)
+        summary = {"n_records": 2, "take_rates": {}}
+        Path(tmpdir, "summary.json").write_text(json.dumps(summary))
+
+        records = load_records(tmpdir)
+        assert len(records) == 2
+        assert all("arm" in r and "item" in r and "answer" in r for r in records)
+
+
+def test_load_records_handles_directory_of_only_records():
+    """A directory of only valid records is unaffected."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        rec1 = {"arm": "A0", "rung": "L1", "item": "i0", "answer": "A", "condition": "think_off"}
+        rec2 = {"arm": "A0", "rung": "L1", "item": "i1", "answer": "B", "condition": "think_off"}
+        rec3 = {"arm": "A3", "rung": "L2", "item": "i2", "answer": "A", "condition": "think_off"}
+        Path(tmpdir, "rec1.json").write_text(json.dumps(rec1))
+        Path(tmpdir, "rec2.json").write_text(json.dumps(rec2))
+        Path(tmpdir, "rec3.json").write_text(json.dumps(rec3))
+
+        records = load_records(tmpdir)
+        assert len(records) == 3
+
+
+def test_load_records_skips_malformed_json():
+    """Malformed or non-object JSON files are silently skipped."""
+    with tempfile.TemporaryDirectory() as tmpdir:
+        # Valid record
+        rec1 = {"arm": "A0", "rung": "L1", "item": "i0", "answer": "A", "condition": "think_off"}
+        Path(tmpdir, "rec1.json").write_text(json.dumps(rec1))
+
+        # Malformed JSON
+        Path(tmpdir, "broken.json").write_text("{ invalid json }")
+
+        # JSON array instead of object
+        Path(tmpdir, "array.json").write_text(json.dumps([1, 2, 3]))
+
+        # JSON object missing required keys
+        Path(tmpdir, "incomplete.json").write_text(json.dumps({"arm": "A0"}))
+
+        records = load_records(tmpdir)
+        assert len(records) == 1
+        assert records[0]["arm"] == "A0"
