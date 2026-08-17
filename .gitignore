@@ -1,0 +1,6 @@
+# raw results are committed gzipped (results/*.jsonl.gz); 93MB uncompressed
+results/*.jsonl
+results/*.log
+__pycache__/
+*.pyc
+.env

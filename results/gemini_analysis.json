@@ -1,0 +1,264 @@
+{
+  "n_rows": 8100,
+  "manipulation": {
+    "none": {
+      "n": 2700,
+      "completion_tokens_mean": 9.14925925925926,
+      "completion_tokens_median": 11
+    },
+    "low": {
+      "n": 2700,
+      "completion_tokens_mean": 127.44481481481482,
+      "completion_tokens_median": 97
+    },
+    "high": {
+      "n": 2700,
+      "completion_tokens_mean": 409.74333333333334,
+      "completion_tokens_median": 331
+    }
+  },
+  "cells": {
+    "aesthetic/haiku": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 24,
+        "mean_abs_dp_all": 0.09333333333333334,
+        "mean_abs_dp_contested": 0.12500000000000003,
+        "spearman": 1.0,
+        "kendall_tau": 1.0,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 0,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 24,
+        "mean_abs_dp_all": 0.1622222222222222,
+        "mean_abs_dp_contested": 0.19166666666666665,
+        "spearman": 0.9878787878787879,
+        "kendall_tau": 0.9555555555555556,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 1,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      }
+    },
+    "aesthetic/sonnet": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 33,
+        "mean_abs_dp_all": 0.07777777777777778,
+        "mean_abs_dp_contested": 0.06666666666666667,
+        "spearman": 0.8787878787878788,
+        "kendall_tau": 0.7333333333333333,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 0,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 33,
+        "mean_abs_dp_all": 0.09777777777777778,
+        "mean_abs_dp_contested": 0.08484848484848484,
+        "spearman": 0.8303030303030303,
+        "kendall_tau": 0.6444444444444445,
+        "top1_changed": true,
+        "top3_churn": 1,
+        "mcnemar_b": 0,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      }
+    },
+    "aesthetic/villanelle": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 23,
+        "mean_abs_dp_all": 0.11555555555555556,
+        "mean_abs_dp_contested": 0.09130434782608696,
+        "spearman": 0.9030303030303031,
+        "kendall_tau": 0.7777777777777778,
+        "top1_changed": true,
+        "top3_churn": 1,
+        "mcnemar_b": 0,
+        "mcnemar_c": 1,
+        "mcnemar_p": 1.0
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 23,
+        "mean_abs_dp_all": 0.18,
+        "mean_abs_dp_contested": 0.1391304347826087,
+        "spearman": 0.8787878787878788,
+        "kendall_tau": 0.7333333333333333,
+        "top1_changed": true,
+        "top3_churn": 1,
+        "mcnemar_b": 0,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      }
+    },
+    "quantitative/10_criteria": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 11,
+        "mean_abs_dp_all": 0.05333333333333333,
+        "mean_abs_dp_contested": 0.13636363636363635,
+        "spearman": 0.9515151515151515,
+        "kendall_tau": 0.8666666666666667,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 2,
+        "mcnemar_c": 0,
+        "mcnemar_p": 0.5
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 11,
+        "mean_abs_dp_all": 0.1911111111111111,
+        "mean_abs_dp_contested": 0.23636363636363636,
+        "spearman": 0.5272727272727273,
+        "kendall_tau": 0.4222222222222222,
+        "top1_changed": true,
+        "top3_churn": 2,
+        "mcnemar_b": 6,
+        "mcnemar_c": 3,
+        "mcnemar_p": 0.5078125
+      }
+    },
+    "quantitative/3_criteria": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 9,
+        "mean_abs_dp_all": 0.055555555555555566,
+        "mean_abs_dp_contested": 0.21111111111111114,
+        "spearman": 0.9757575757575757,
+        "kendall_tau": 0.9111111111111111,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 1,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 9,
+        "mean_abs_dp_all": 0.07555555555555556,
+        "mean_abs_dp_contested": 0.23333333333333334,
+        "spearman": 0.9151515151515152,
+        "kendall_tau": 0.8222222222222222,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 1,
+        "mcnemar_c": 0,
+        "mcnemar_p": 1.0
+      }
+    },
+    "quantitative/5_criteria": {
+      "low": {
+        "n_pairs": 45,
+        "n_contested": 9,
+        "mean_abs_dp_all": 0.06444444444444444,
+        "mean_abs_dp_contested": 0.30000000000000004,
+        "spearman": 0.9757575757575757,
+        "kendall_tau": 0.9111111111111111,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 0,
+        "mcnemar_c": 1,
+        "mcnemar_p": 1.0
+      },
+      "high": {
+        "n_pairs": 45,
+        "n_contested": 9,
+        "mean_abs_dp_all": 0.11333333333333334,
+        "mean_abs_dp_contested": 0.3333333333333333,
+        "spearman": 0.9515151515151515,
+        "kendall_tau": 0.8666666666666667,
+        "top1_changed": false,
+        "top3_churn": 0,
+        "mcnemar_b": 0,
+        "mcnemar_c": 2,
+        "mcnemar_p": 0.5
+      }
+    }
+  },
+  "holm": [
+    {
+      "cell": "aesthetic/haiku",
+      "level": "low",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "aesthetic/haiku",
+      "level": "high",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "aesthetic/sonnet",
+      "level": "low",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "aesthetic/sonnet",
+      "level": "high",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "aesthetic/villanelle",
+      "level": "low",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "aesthetic/villanelle",
+      "level": "high",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/10_criteria",
+      "level": "low",
+      "raw": 0.5,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/10_criteria",
+      "level": "high",
+      "raw": 0.5078125,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/3_criteria",
+      "level": "low",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/3_criteria",
+      "level": "high",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/5_criteria",
+      "level": "low",
+      "raw": 1.0,
+      "holm": 1.0
+    },
+    {
+      "cell": "quantitative/5_criteria",
+      "level": "high",
+      "raw": 0.5,
+      "holm": 1.0
+    }
+  ]
+}

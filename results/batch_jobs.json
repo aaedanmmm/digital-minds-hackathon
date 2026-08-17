@@ -1,0 +1,60 @@
+[
+  {
+    "arm": "gemini",
+    "id": "batch-1786929662-VpVLS6kSoxJmYlL4mNa8",
+    "n": 2700,
+    "submitted": "2026-08-17T01:21:04.622364+00:00"
+  },
+  {
+    "arm": "gemini",
+    "id": "batch-1786929666-4oi4cfuH14WAmU7CCS3a",
+    "n": 2700,
+    "submitted": "2026-08-17T01:21:09.456295+00:00"
+  },
+  {
+    "arm": "gemini",
+    "id": "batch-1786929672-HDErdqc5rMpuTpnN2ehq",
+    "n": 2700,
+    "submitted": "2026-08-17T01:21:15.803109+00:00"
+  },
+  {
+    "arm": "openai/scratchpad",
+    "id": "batch-1786929679-0A9FaZxtvXumnPlYhSDs",
+    "n": 2700,
+    "submitted": "2026-08-17T01:21:22.102471+00:00"
+  },
+  {
+    "arm": "openai/scratchpad",
+    "id": "batch-1786929685-4WA128U65U4WSyFt0NOv",
+    "n": 2700,
+    "submitted": "2026-08-17T01:21:27.704530+00:00"
+  },
+  {
+    "arm": "gemini-retry",
+    "id": "batch-1786929790-giBwQIQtCONhxNsYTAPe",
+    "n": 2700
+  },
+  {
+    "arm": "gemini-retry",
+    "id": "batch-1786929795-3Mczy6Jo0iNlKe8thORt",
+    "n": 2700
+  },
+  {
+    "arm": "openai/answer",
+    "id": "batch-1786930162-1NJJFt89jcLIQqAECxdR",
+    "n": 2700,
+    "submitted": "2026-08-17T01:29:25.718037+00:00"
+  },
+  {
+    "arm": "openai/answer",
+    "id": "batch-1786930168-NmGONyngy6ZmMoyTJvzG",
+    "n": 2700,
+    "submitted": "2026-08-17T01:29:30.395330+00:00"
+  },
+  {
+    "arm": "openai/answer",
+    "id": "batch-1786930172-Zt5BBNUDhhMQKNNgRLWJ",
+    "n": 2700,
+    "submitted": "2026-08-17T01:29:34.983539+00:00"
+  }
+]
