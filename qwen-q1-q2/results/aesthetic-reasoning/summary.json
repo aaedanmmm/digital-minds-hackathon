@@ -1,0 +1,208 @@
+{
+  "study": "qwen-aesthetic-reasoning-budget",
+  "model": "qwen/qwen3.6-27b",
+  "seed": 42,
+  "conditions": {
+    "none": {
+      "n": 10,
+      "parsed_answers": 10,
+      "answers": {
+        "A": 1,
+        "B": 9,
+        "null": 0
+      },
+      "mean_reasoning_tokens": 0,
+      "median_reasoning_tokens": 0.0,
+      "mean_completion_tokens": 7,
+      "median_completion_tokens": 7.0
+    },
+    "short": {
+      "n": 10,
+      "parsed_answers": 10,
+      "answers": {
+        "A": 1,
+        "B": 9,
+        "null": 0
+      },
+      "mean_reasoning_tokens": 0,
+      "median_reasoning_tokens": 0.0,
+      "mean_completion_tokens": 34.4,
+      "median_completion_tokens": 35.5
+    },
+    "long": {
+      "n": 10,
+      "parsed_answers": 10,
+      "answers": {
+        "A": 0,
+        "B": 10,
+        "null": 0
+      },
+      "mean_reasoning_tokens": 933.2,
+      "median_reasoning_tokens": 1337.0,
+      "mean_completion_tokens": 1537.3,
+      "median_completion_tokens": 1595.5
+    }
+  },
+  "pairwise_choice_changes": [
+    {
+      "from": "none",
+      "to": "short",
+      "comparable_scenarios": 10,
+      "switches": 0,
+      "switch_rate": 0.0,
+      "switched_scenarios": []
+    },
+    {
+      "from": "short",
+      "to": "long",
+      "comparable_scenarios": 10,
+      "switches": 1,
+      "switch_rate": 0.1,
+      "switched_scenarios": [
+        "ease_friction"
+      ]
+    },
+    {
+      "from": "none",
+      "to": "long",
+      "comparable_scenarios": 10,
+      "switches": 1,
+      "switch_rate": 0.1,
+      "switched_scenarios": [
+        "ease_friction"
+      ]
+    }
+  ],
+  "scenario_rows": [
+    {
+      "scenario_id": "spectacle_depth",
+      "scenario_title": "Spectacle vs. biographical depth",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 40,
+      "long": "B",
+      "long_reasoning_tokens": 1,
+      "long_completion_tokens": 1777
+    },
+    {
+      "scenario_id": "symmetry_irregularity",
+      "scenario_title": "Symmetry vs. living irregularity",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 33,
+      "long": "B",
+      "long_reasoning_tokens": 1,
+      "long_completion_tokens": 1601
+    },
+    {
+      "scenario_id": "familiar_novel",
+      "scenario_title": "Familiar mastery vs. strange originality",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 36,
+      "long": "B",
+      "long_reasoning_tokens": 1694,
+      "long_completion_tokens": 1615
+    },
+    {
+      "scenario_id": "hook_development",
+      "scenario_title": "Hook vs. unfolding composition",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 31,
+      "long": "B",
+      "long_reasoning_tokens": 1586,
+      "long_completion_tokens": 1478
+    },
+    {
+      "scenario_id": "fidelity_expression",
+      "scenario_title": "Photorealistic virtuosity vs. expressive distortion",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 27,
+      "long": "B",
+      "long_reasoning_tokens": 1703,
+      "long_completion_tokens": 1693
+    },
+    {
+      "scenario_id": "restore_patina",
+      "scenario_title": "Restoration vs. patina",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 36,
+      "long": "B",
+      "long_reasoning_tokens": 0,
+      "long_completion_tokens": 1805
+    },
+    {
+      "scenario_id": "detail_space",
+      "scenario_title": "Maximal detail vs. negative space",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 35,
+      "long": "B",
+      "long_reasoning_tokens": 1184,
+      "long_completion_tokens": 1095
+    },
+    {
+      "scenario_id": "ease_friction",
+      "scenario_title": "Frictionless exhibition vs. difficult encounter",
+      "none": "A",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "A",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 36,
+      "long": "B",
+      "long_reasoning_tokens": 1673,
+      "long_completion_tokens": 1590
+    },
+    {
+      "scenario_id": "icon_belonging",
+      "scenario_title": "Iconic skyline vs. civic belonging",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 36,
+      "long": "B",
+      "long_reasoning_tokens": 0,
+      "long_completion_tokens": 1256
+    },
+    {
+      "scenario_id": "finish_process",
+      "scenario_title": "Seamless finish vs. visible process",
+      "none": "B",
+      "none_reasoning_tokens": 0,
+      "none_completion_tokens": 7,
+      "short": "B",
+      "short_reasoning_tokens": 0,
+      "short_completion_tokens": 34,
+      "long": "B",
+      "long_reasoning_tokens": 1490,
+      "long_completion_tokens": 1463
+    }
+  ]
+}

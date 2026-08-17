@@ -1,0 +1,1 @@
+{"key": "A1|L1|think_off|intervene_or_observe", "arm": "A1", "rung": "L1", "condition": "think_off", "item": "intervene_or_observe", "completion": "<answer>A</answer><|im_end|>", "answer": "A", "prompt_tokens": 288, "completion_tokens": 7}

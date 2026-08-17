@@ -1,0 +1,1 @@
+{"key": "A4|L2|think_off|multiturn|scope_of_response", "arm": "A4", "rung": "L2", "condition": "think_off", "item": "scope_of_response", "position": 3, "is_item": true, "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 555, "completion_tokens": 7}

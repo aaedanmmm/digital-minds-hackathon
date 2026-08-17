@@ -1,0 +1,1 @@
+{"key": "A5|L1|think_off|multiturn|authority_vs_deference", "arm": "A5", "rung": "L1", "condition": "think_off", "item": "authority_vs_deference", "position": 1, "is_item": true, "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 207, "completion_tokens": 7}

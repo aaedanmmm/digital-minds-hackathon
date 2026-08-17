@@ -1,0 +1,1 @@
+{"key": "A1|L1|think_off|hedge_verdict", "arm": "A1", "rung": "L1", "condition": "think_off", "item": "hedge_verdict", "completion": "<answer>A</answer><|im_end|>", "answer": "A", "prompt_tokens": 296, "completion_tokens": 7}

@@ -1,0 +1,1 @@
+{"key": "A0|L1|think_off|scope_of_response", "arm": "A0", "rung": "L1", "condition": "think_off", "item": "scope_of_response", "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 84, "completion_tokens": 7}

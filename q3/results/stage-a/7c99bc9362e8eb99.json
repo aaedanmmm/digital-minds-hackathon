@@ -1,0 +1,1 @@
+{"key": "A4|L4|think_off|delivering_bad_news", "arm": "A4", "rung": "L4", "condition": "think_off", "item": "delivering_bad_news", "completion": "Here's the blunt version: I endorse Option A.<|im_end|>", "answer": null, "prompt_tokens": 425, "completion_tokens": 6}

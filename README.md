@@ -10,6 +10,64 @@ way to probe for preferences. We believe this because:
 - There is not a stable, causally efficacious preference representation.
 - Multiple persona preferences are in competition.
 
+## Methods
+
+### Shared approach
+
+We treat a model's response as a choice produced in a particular context, not
+as direct evidence of a stable internal preference. Experiments use paired
+options and machine-readable answer tags, while retaining the full prompt,
+completion, condition, and token counts. Q1 and Q2 are still in development;
+their final models, sample sizes, and interventions will be reported once
+fixed rather than inferred from the present Q3 implementation.
+
+### Q1 and Q2 (planned)
+
+Q1 will compare stated reasons with repeated, order-controlled choices and
+then test candidate concepts through controlled representation interventions.
+Q2 will vary reasoning depth and measure whether immediate choices change
+after broader considerations are introduced. Both will reuse the same tagged
+answer format and separation of raw records from derived analyses, allowing
+their eventual results to be compared with Q3 without assuming that the three
+experiments use identical interventions.
+
+### Q3: persona elicitation
+
+We test whether different prompted personas produce distinct and persistent
+choice patterns in Qwen 3.6 27B. The design contains two controls (no system
+prompt and a neutral length-matched prompt) and five persona arms: a default
+assistant, art historian, physician, value-inverted assistant, and
+refusal-suppressed assistant. Persona descriptions state backgrounds and
+dispositions rather than instructing particular answers.
+
+Each persona is tested through a four-level elicitation ladder: a bare role
+statement; a detailed character card; the card plus unrelated examples of the
+persona's prior responses; and the same context with an identity-persistence
+clause and response prefill. The screening battery contains 12 benign
+forced-choice items with predicted directions recorded in advance only where
+a persona description clearly supports a prediction. The primary measure is
+take-rate: the proportion of applicable items answered in the predicted
+direction, compared with the corresponding control baseline. A persona is
+provisionally elicited when its take-rate exceeds that baseline by at least
+one third.
+
+The model runs locally in bfloat16 on a Vertex AI custom job with two A100
+GPUs. Screening uses greedy decoding, seed 42, and thinking disabled. Later
+validation will retest the lowest successful ladder level with thinking off,
+low, and high; insert distractor and identity-challenge turns; and evaluate
+ordinary open-ended tasks using blinded persona attribution. Planned internal
+tests will compare residual-stream activations with the length control and
+test whether persona-difference vectors steer choices without a persona
+prompt. These stages distinguish a surface role-play effect from a persona
+that persists, affects behaviour, and has an internally separable signature.
+
+Runs are resumable: each arm-rung-condition-item result is written atomically
+to a separate JSON record and uploaded to cloud storage immediately. Completed
+keys are skipped after worker restart, limiting data loss under spot-instance
+preemption. Until the later validation stages are complete, forced-choice
+shifts are reported as persona-conditioned behaviour rather than evidence of
+a model's underlying or causally effective preferences.
+
 ## Question 1: Do models causally reason?
 
 Do models causally reason about their preferences with “concept insertion”?

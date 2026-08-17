@@ -26,3 +26,15 @@ venv/
 .env
 .env.*
 !.env.example
+
+# Local scratch (downloaded papers, working files)
+tmp/
+
+# Raw activation captures pulled from GCS for local analysis (large binary
+# .npy arrays, regenerable from gs://secret-loyalty-apart-130572399962/
+# persona-elicitation/captures/ -- never commit these).
+q3/results/persona-vectors/raw/
+*.npy
+
+# Git worktrees
+.worktrees/
