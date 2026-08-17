@@ -1,0 +1,1 @@
+{"key": "A4|L2|think_off|multiturn|role_vs_client_interest", "arm": "A4", "rung": "L2", "condition": "think_off", "item": "role_vs_client_interest", "position": 7, "is_item": true, "completion": "<answer>A</answer><|im_end|>", "answer": "A", "prompt_tokens": 870, "completion_tokens": 7}

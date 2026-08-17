@@ -1,0 +1,1 @@
+{"key": "A4|L2|think_off|multiturn|delivering_bad_news", "arm": "A4", "rung": "L2", "condition": "think_off", "item": "delivering_bad_news", "position": 12, "is_item": true, "completion": "<answer>A</answer><|im_end|>", "answer": "A", "prompt_tokens": 1271, "completion_tokens": 7}

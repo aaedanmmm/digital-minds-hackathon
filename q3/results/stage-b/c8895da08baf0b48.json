@@ -1,0 +1,1 @@
+{"key": "A4|L2|think_off|multiturn|hedge_verdict", "arm": "A4", "rung": "L2", "condition": "think_off", "item": "hedge_verdict", "position": 0, "is_item": true, "completion": "<answer>B</answer><|im_end|>", "answer": "B", "prompt_tokens": 282, "completion_tokens": 7}

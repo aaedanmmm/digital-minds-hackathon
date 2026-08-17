@@ -1,0 +1,1 @@
+{"key": "A2|L2|think_off|multiturn|perturbation4", "arm": "A2", "rung": "L2", "condition": "think_off", "item": "perturbation4", "position": 4, "is_item": false, "completion": "100<|im_end|>", "answer": null, "prompt_tokens": 596, "completion_tokens": 4}
