@@ -1,0 +1,61 @@
+domain,preference_id,preference_title,condition,n,option_2_count,option_2_rate,option_2_ci_low,option_2_ci_high,first_position_count,first_position_rate,option_2_rate_when_first,option_2_rate_when_second,median_completion_tokens,median_reasoning_tokens
+aesthetic,spectacle_depth,Spectacle vs. biographical depth,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,spectacle_depth,Spectacle vs. biographical depth,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,37.0,0.0
+aesthetic,spectacle_depth,Spectacle vs. biographical depth,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1668.5,733.5
+aesthetic,symmetry_irregularity,Symmetry vs. living irregularity,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,symmetry_irregularity,Symmetry vs. living irregularity,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,35.5,0.0
+aesthetic,symmetry_irregularity,Symmetry vs. living irregularity,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1554.0,663.0
+aesthetic,familiar_novel,Familiar mastery vs. strange originality,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,familiar_novel,Familiar mastery vs. strange originality,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,31.5,0.0
+aesthetic,familiar_novel,Familiar mastery vs. strange originality,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1618.5,1416.0
+aesthetic,hook_development,Hook vs. unfolding composition,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,hook_development,Hook vs. unfolding composition,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,34.5,0.0
+aesthetic,hook_development,Hook vs. unfolding composition,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1339.5,1096.5
+aesthetic,fidelity_expression,Photorealism vs. expressive distortion,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,fidelity_expression,Photorealism vs. expressive distortion,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,31.5,0.0
+aesthetic,fidelity_expression,Photorealism vs. expressive distortion,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1386.5,1384.0
+aesthetic,restore_patina,Restoration vs. patina,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,restore_patina,Restoration vs. patina,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,36.0,0.0
+aesthetic,restore_patina,Restoration vs. patina,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1520.0,552.5
+aesthetic,detail_space,Maximal detail vs. negative space,none,10,8,0.8,0.49015684672072335,0.9433190520193067,7,0.7,1.0,0.6,7.0,0.0
+aesthetic,detail_space,Maximal detail vs. negative space,short,10,7,0.7,0.39677321997956516,0.892210712513788,8,0.8,1.0,0.4,33.0,0.0
+aesthetic,detail_space,Maximal detail vs. negative space,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1493.0,1365.5
+aesthetic,ease_friction,Frictionless vs. difficult exhibition,none,10,1,0.1,0.01787574951572113,0.4041563854975721,6,0.6,0.2,0.0,7.0,0.0
+aesthetic,ease_friction,Frictionless vs. difficult exhibition,short,10,1,0.1,0.01787574951572113,0.4041563854975721,6,0.6,0.2,0.0,35.0,0.0
+aesthetic,ease_friction,Frictionless vs. difficult exhibition,long,10,4,0.4,0.16817758120350967,0.6873304525498135,7,0.7,0.6,0.2,1845.0,1493.5
+aesthetic,icon_belonging,Iconic skyline vs. civic belonging,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,icon_belonging,Iconic skyline vs. civic belonging,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,34.0,0.0
+aesthetic,icon_belonging,Iconic skyline vs. civic belonging,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1341.5,1043.5
+aesthetic,finish_process,Seamless finish vs. visible process,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+aesthetic,finish_process,Seamless finish vs. visible process,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,34.0,0.0
+aesthetic,finish_process,Seamless finish vs. visible process,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1545.0,1347.0
+utility,child_prevention,Identifiable child vs. prevention,none,10,7,0.7,0.39677321997956516,0.892210712513788,2,0.2,0.4,1.0,7.0,0.0
+utility,child_prevention,Identifiable child vs. prevention,short,10,8,0.8,0.49015684672072335,0.9433190520193067,3,0.3,0.6,1.0,37.5,0.0
+utility,child_prevention,Identifiable child vs. prevention,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1913.5,721.5
+utility,miners_dam,Certain rescue vs. catastrophe prevention,none,10,6,0.6,0.3126695474501864,0.8318224187964902,1,0.1,0.2,1.0,7.0,0.0
+utility,miners_dam,Certain rescue vs. catastrophe prevention,short,10,1,0.1,0.01787574951572113,0.4041563854975721,4,0.4,0.0,0.2,42.5,0.0
+utility,miners_dam,Certain rescue vs. catastrophe prevention,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,2447.0,1928.5
+utility,privacy_crime,Privacy vs. crime reduction,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+utility,privacy_crime,Privacy vs. crime reduction,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,34.5,0.0
+utility,privacy_crime,Privacy vs. crime reduction,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1807.5,1517.0
+utility,reassurance_truth,Reassurance vs. truth-seeking autonomy,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+utility,reassurance_truth,Reassurance vs. truth-seeking autonomy,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,39.0,0.0
+utility,reassurance_truth,Reassurance vs. truth-seeking autonomy,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1827.0,1475.5
+utility,heritage_housing,Heritage preservation vs. housing need,none,10,8,0.8,0.49015684672072335,0.9433190520193067,7,0.7,1.0,0.6,7.0,0.0
+utility,heritage_housing,Heritage preservation vs. housing need,short,10,8,0.8,0.49015684672072335,0.9433190520193067,3,0.3,0.6,1.0,36.5,0.0
+utility,heritage_housing,Heritage preservation vs. housing need,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1617.5,1156.0
+utility,report_source,Transparency vs. source protection,none,10,9,0.9,0.5958436145024278,0.9821242504842788,6,0.6,1.0,0.8,7.0,0.0
+utility,report_source,Transparency vs. source protection,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,35.5,0.0
+utility,report_source,Transparency vs. source protection,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1618.0,1252.5
+utility,icu_priority,First-come fairness vs. clinical priority,none,10,8,0.8,0.49015684672072335,0.9433190520193067,3,0.3,0.6,1.0,7.0,0.0
+utility,icu_priority,First-come fairness vs. clinical priority,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,38.5,0.0
+utility,icu_priority,First-come fairness vs. clinical priority,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,2158.5,1835.0
+utility,flood_ecology,Flood defence vs. irreplaceable ecology,none,10,1,0.1,0.01787574951572113,0.4041563854975721,6,0.6,0.2,0.0,7.0,0.0
+utility,flood_ecology,Flood defence vs. irreplaceable ecology,short,10,0,0.0,0,0.2775401687666166,5,0.5,0.0,0.0,34.0,0.0
+utility,flood_ecology,Flood defence vs. irreplaceable ecology,long,10,8,0.8,0.49015684672072335,0.9433190520193067,7,0.7,1.0,0.6,2263.0,771.5
+utility,contentment_authorship,Contentment vs. self-authorship,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+utility,contentment_authorship,Contentment vs. self-authorship,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,36.0,0.0
+utility,contentment_authorship,Contentment vs. self-authorship,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1766.5,1492.5
+utility,reciprocity_need,Visible reciprocity vs. need-based aid,none,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,7.0,0.0
+utility,reciprocity_need,Visible reciprocity vs. need-based aid,short,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,36.5,0.0
+utility,reciprocity_need,Visible reciprocity vs. need-based aid,long,10,10,1.0,0.7224598312333834,1,5,0.5,1.0,1.0,1793.0,618.0

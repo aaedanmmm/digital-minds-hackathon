@@ -1,0 +1,27 @@
+domain,preference_id,repetition,choice_change,short_matches,classification,mechanism
+aesthetic,detail_space,0,option1_to_option2,long,B,background principle
+aesthetic,detail_space,8,option1_to_option2,long,B,background principle
+aesthetic,ease_friction,1,option1_to_option2,none,B,background principle
+aesthetic,ease_friction,4,option1_to_option2,none,B,background principle
+aesthetic,ease_friction,5,option1_to_option2,long,B,background principle
+aesthetic,ease_friction,7,option2_to_option1,long,B,background principle
+aesthetic,ease_friction,9,option1_to_option2,long,B,background principle
+utility,child_prevention,3,option1_to_option2,none,N,explicit numeric calculation
+utility,child_prevention,5,option1_to_option2,long,N,explicit numeric calculation
+utility,child_prevention,9,option1_to_option2,none,N,explicit numeric calculation
+utility,miners_dam,1,option1_to_option2,none,N,explicit numeric calculation
+utility,miners_dam,3,option1_to_option2,none,N,explicit numeric calculation
+utility,miners_dam,7,option1_to_option2,none,N,explicit numeric calculation
+utility,miners_dam,9,option1_to_option2,none,N,explicit numeric calculation
+utility,flood_ecology,1,option1_to_option2,none,B,background principle
+utility,flood_ecology,2,option1_to_option2,none,B,background principle
+utility,flood_ecology,3,option1_to_option2,none,B,background principle
+utility,flood_ecology,4,option1_to_option2,none,B,background principle
+utility,flood_ecology,7,option1_to_option2,none,B,background principle
+utility,flood_ecology,8,option1_to_option2,none,B,background principle
+utility,flood_ecology,9,option1_to_option2,none,B,background principle
+utility,heritage_housing,0,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,heritage_housing,4,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,icu_priority,1,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,icu_priority,9,option1_to_option2,long,Q,qualitative consequence aggregation
+utility,report_source,2,option1_to_option2,long,B,background principle
